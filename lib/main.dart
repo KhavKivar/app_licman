@@ -5,6 +5,10 @@ import 'package:app_licman/ui/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'const/Colors.dart';
+import 'model/state/actaState.dart';
+import 'model/state/commonVarState.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -18,12 +22,17 @@ class MyApp extends StatelessWidget {
     return  MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => EquipoState()),
+        ChangeNotifierProvider(create: (context) => ActaState()),
+        ChangeNotifierProvider(create: (context) => CommonState()),
       ],
       child: MaterialApp(
         title: 'Licman App',
           debugShowCheckedModeBanner: false,
-        theme:ThemeData(primarySwatch: Colors.yellow),
-        home:const ActaGeneral()
+        theme:ThemeData(fontFamily: 'Poppins',
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor:yellowBackground
+        ),
+        home: Homepage()
       ),
     );
   }

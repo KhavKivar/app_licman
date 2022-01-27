@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.0.2
   flutter_typeahead: ^3.2.4
   signature: ^5.0.0
+  flutter_svg: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -62,9 +63,14 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/Hyster H2.5FT.png
+    - assets/ETV 214.jpg
+    - assets/EFG 220.jpg
+    - assets/ERE 224.jpg
+    - assets/H3.0FT.jpg
+    - assets/logo.svg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -77,10 +83,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

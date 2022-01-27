@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
+import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/equipo.dart';
+import 'package:app_licman/model/state/actaState.dart';
 import 'package:app_licman/model/state/equipoState.dart';
 import 'package:app_licman/ui/signature_page.dart';
+import 'package:app_licman/widget/bottomNavigator.dart';
 import 'package:app_licman/widget/details_equipo_widget.dart';
 import 'package:app_licman/widget/tipo_acta_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +14,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 
+import 'acta_general_part_2_page.dart';
 import 'acta_inspeccion_page.dart';
 
 class ActaGeneral extends StatefulWidget {
@@ -18,61 +24,69 @@ class ActaGeneral extends StatefulWidget {
   _ActaGeneralState createState() => _ActaGeneralState();
 }
 
-class _ActaGeneralState extends State<ActaGeneral> {
+class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClientMixin  {
   late final equiposStateProvider;
   final TextEditingController? _typeAheadController = TextEditingController();
-  final SignatureController _controller = SignatureController(
-    penStrokeWidth: 1,
-    penColor: Colors.white,
-    exportBackgroundColor: Colors.black,
-    onDrawStart: () => print('onDrawStart called!'),
-    onDrawEnd: () => print('onDrawEnd called!'),
-  );
+
   Equipo? equipoSelect = null;
 
   @override
   void initState() {
     super.initState();
+
     equiposStateProvider = Provider.of<EquipoState>(context, listen: false);
-    equiposStateProvider.initState(context);
   }
 
-  final double fontSizeTextRow = 19;
+  final double fontSizeTextRow = 22;
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(title: const Text("Acta de inspeccion")),
-      body: SingleChildScrollView(
-        child: Center(
-          child: SizedBox(
-            
-            width: width * 0.8,
+    return Provider.of<EquipoState>(context).loading == true
+          ? Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text("Loading"),
+                ],
+              ),
+            )
+          : Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 50),
             child: Column(
               children: [
                 const SizedBox(
                   height: 20,
-                ),
-                Text(
-                  "ACTA DE INSPECCION",
-                  style: TextStyle(fontSize: 30),
                 ),
                 Column(
                   children: [
                     TypeAheadField(
                       textFieldConfiguration: TextFieldConfiguration(
                           controller: _typeAheadController,
-                          autofocus: true,
+                          style: TextStyle(color: dark, fontSize: 23),
                           decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             prefixIcon: Icon(
                               Icons.assignment,
-                              color: Colors.blue,
+                              color: dark,
+                              size: 30,
                             ),
                             hintText: 'Codigo interno',
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: Colors.grey, width: 2),
+                            ),
                           )),
                       suggestionsCallback: (pattern) async {
-                        List<Equipo> equipos = equiposStateProvider.getEquipo();
+                        List<Equipo> equipos =
+                            equiposStateProvider.getEquipo();
                         List<String> suggestCodigo = [];
                         for (int i = 0; i < equipos.length; i++) {
                           suggestCodigo.add(equipos[i].id.toString());
@@ -80,21 +94,24 @@ class _ActaGeneralState extends State<ActaGeneral> {
                         return suggestCodigo
                             .where((element) => element
                                 .toString()
-                                .contains(pattern.toString().toLowerCase()))
+                                .contains(
+                                    pattern.toString().toLowerCase()))
                             .toList();
                       },
                       itemBuilder: (context, suggestion) {
-                        List<Equipo> equipos = equiposStateProvider.getEquipo();
-                        int index = equipos.lastIndexWhere(
-                            (element) => element.id.toString() == suggestion);
+                        List<Equipo> equipos =
+                            equiposStateProvider.getEquipo();
+                        int index = equipos.lastIndexWhere((element) =>
+                            element.id.toString() == suggestion);
 
                         return ListTile(
                           leading: Icon(
                             Icons.assignment,
                             size: 52.0,
-                            color: Colors.blue,
+                            color: dark,
                           ),
-                          title: Text("Numero interno: " + suggestion.toString()),
+                          title: Text(
+                              "Numero interno: " + suggestion.toString()),
                           subtitle: Text("Tipo: " +
                               equipos[index].tipo.toString() +
                               "\n" +
@@ -110,10 +127,12 @@ class _ActaGeneralState extends State<ActaGeneral> {
                         );
                       },
                       onSuggestionSelected: (String suggestion) {
-                        List<Equipo> equipos = equiposStateProvider.getEquipo();
+                        List<Equipo> equipos =
+                            equiposStateProvider.getEquipo();
                         _typeAheadController?.text = suggestion;
                         equipoSelect = equipos.firstWhere((element) =>
-                            element.id.toString() == suggestion.toString());
+                            element.id.toString() ==
+                            suggestion.toString());
                         setState(() {});
                       },
                     ),
@@ -123,72 +142,77 @@ class _ActaGeneralState extends State<ActaGeneral> {
                     if (equipoSelect != null)
                       Column(
                         children: [
-                          DetalleEquipoWidget(fontSizeTextRow: fontSizeTextRow, equipoSelect: equipoSelect!,),
-                          TipoActaWidget(),
+                          DetalleEquipoWidget(
+                            fontSizeTextRow: fontSizeTextRow,
+                            equipoSelect: equipoSelect!,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
 
+                              border: Border.all(color:Colors.grey,width: 2),
+                              borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RegisterPage()),
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: const [
+                                  Icon(
+                                    Icons.assignment,
+                                    color: Colors.black,
+                                    size: 30,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5.0),
+                                    child: Text("Acta de inspeccion"),
+                                  ),
+                                ],
+                              ),
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                primary: dark,
+                                shadowColor: Colors.white,
+                                elevation: 5,
 
-
+                                textStyle: TextStyle(
+                                    fontSize: 30,
+                                    fontStyle: FontStyle.normal),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
                         ],
                       )
                   ],
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
+          );
+
   }
+
+  @override
+  bool get wantKeepAlive => true; //
 }
 /*
 
-  Row(
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child:  Signature(
 
-                                  height: height*0.4,
-
-                                  backgroundColor: Colors.black, controller: _controller),
-                                ),
-                              const SizedBox(width: 30,),
-                              Flexible(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    TextField(
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.greenAccent,
-                                              width: 1.0),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.red, width: 1.0),
-                                        ),
-                                        hintText: 'Rut',
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    TextField(
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.greenAccent, width: 1.0),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.red, width: 1.0),
-                                        ),
-                                        hintText: 'Nombre recepcionista',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            ],
-                          ),
 * */
