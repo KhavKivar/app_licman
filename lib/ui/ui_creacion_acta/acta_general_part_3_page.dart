@@ -1,9 +1,24 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:app_licman/const/Colors.dart';
+import 'package:app_licman/const/Strings.dart';
+import 'package:app_licman/model/inspeccion.dart';
+import 'package:app_licman/model/state/commonVarState.dart';
+import 'package:app_licman/model/state/equipoState.dart';
+
+import 'package:app_licman/services/generate_image_url.dart';
+import 'package:app_licman/services/inspeccion_services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import 'package:http/http.dart' as http;
+
+import '../../model/state/actaState.dart';
 
 class ActaGeneralPartThree extends StatefulWidget {
   const ActaGeneralPartThree({Key? key}) : super(key: key);
@@ -12,7 +27,8 @@ class ActaGeneralPartThree extends StatefulWidget {
   _ActaGeneralPartThreeState createState() => _ActaGeneralPartThreeState();
 }
 
-class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with AutomaticKeepAliveClientMixin{
+class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree>
+    with AutomaticKeepAliveClientMixin {
   final SignatureController _controller = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,
@@ -30,6 +46,7 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
     _controller.addListener(() => print('Value changed'));
   }
 
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -37,7 +54,9 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: Column(
         children: [
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           Stack(
             children: [
               Signature(
@@ -55,7 +74,7 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
           ),
           Container(
             decoration: BoxDecoration(
-                color:dark,
+                color: dark,
                 border: Border.all(color: Colors.white, width: 0.5)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -67,8 +86,9 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
                   color: Colors.white,
                   onPressed: () async {
                     if (_controller.isNotEmpty) {
-                      final Uint8List? data =
-                      await _controller.toPngBytes();
+                      final Uint8List? data = await _controller.toPngBytes();
+
+
                       if (data != null) {
                         setState(() {
                           activar = true;
@@ -105,14 +125,80 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
               ],
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     primary: Colors.blueAccent,
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+
+                    Inspeccion acta = Provider.of<ActaState>(context,listen: false).convertMapToObject("adfas.com");
+                    log(acta.toJson().toString());
+                    final result = await sendActa(acta);
+                    if(result != null){
+                      Provider.of<EquipoState>(context,listen: false).addActa(result);
+                      Provider.of<EquipoState>(context,listen: false).setHorometro(acta.idEquipo!,acta.horometroActual!);
+                      Provider.of<CommonState>(context,listen: false).changeActaIndex(0);
+                      Navigator.pop(context);
+
+                    }
+
+
+                    /*
+                    final Uint8List? data = await _controller.toPngBytes();
+                    //enviar la foto
+                    GenerateImageUrl generateImageUrl = GenerateImageUrl();
+                    await generateImageUrl.call(".png");
+
+                    print(generateImageUrl.uploadUrl);
+
+                    String uploadUrl;
+                    if (generateImageUrl.isGenerated != null &&
+                        generateImageUrl.isGenerated!) {
+
+                      uploadUrl = generateImageUrl.uploadUrl!;
+
+                    } else {
+                      throw generateImageUrl.message!;
+                    }
+                    Uint8List imageInUnit8List = data!;
+                    final tempDir = await getTemporaryDirectory();
+
+                    File file =
+                    await File('${tempDir.path}/image.png').create();
+                    file.writeAsBytesSync(imageInUnit8List);
+
+                    var response = await http.put(Uri.parse(uploadUrl),
+                        body: file.readAsBytesSync());
+
+
+                    print(response.body);
+
+
+
+
+
+                    sendBody["firmaURL"] = generateImageUrl.downloadUrl!;
+                   // sendBody["firmaURL"] ="as.com";
+                    log(sendBody.toString());
+
+                    final result = await makePostRequest(Strings.urlServerPostInps,sendBody);
+                     if(result != null){
+                      Provider.of<EquipoState>(context,listen: false).addActa(result);
+                      Provider.of<EquipoState>(context,listen: false).setHorometro(int.parse(providerVar.id),int.parse(providerVar.horometroActual));
+                      Provider.of<CommonState>(context,listen: false).changeActaIndex(0);
+                      Navigator.pop(context);
+
+                    }
+
+                     */
+
+
+
 
                   },
                   icon: Icon(
@@ -133,5 +219,17 @@ class _ActaGeneralPartThreeState extends State<ActaGeneralPartThree> with Automa
         ],
       ),
     );
+  }
+}
+
+Future<bool> uploadFile(context, String url, File image) async {
+  try {
+    UploadFile uploadFile = UploadFile();
+    await uploadFile.call(url, image);
+
+    return true;
+  } catch (e) {
+    print(e);
+    throw e;
   }
 }

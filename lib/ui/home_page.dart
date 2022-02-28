@@ -1,7 +1,9 @@
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/equipo.dart';
+import 'package:app_licman/model/state/actaState.dart';
 import 'package:app_licman/model/state/commonVarState.dart';
 import 'package:app_licman/model/state/equipoState.dart';
+
 import 'package:app_licman/widget/bottomNavigator.dart';
 import 'package:app_licman/widget/card_equipo_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +12,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 
-import 'acta_general_page.dart';
+import 'ui_creacion_acta/acta_general_page.dart';
 import 'card_equipo_detalle.dart';
 
 class Homepage extends StatefulWidget {
@@ -20,136 +22,178 @@ class Homepage extends StatefulWidget {
   HomepageState createState() => HomepageState();
 }
 
-class HomepageState extends State<Homepage> with WidgetsBindingObserver {
+class HomepageState extends State<Homepage> {
   int choose = -1;
   double witt = 300;
   final searchController = TextEditingController();
   bool select = false;
-  List? equipos;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-  }
+  List equipos = [];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+
     Provider.of<EquipoState>(context, listen: false).initState(context);
+    Provider.of<ActaState>(context, listen: false).init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    equipos = Provider.of<EquipoState>(context).filterListEquipo;
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
     print("dispose");
     super.dispose();
   }
 
-
-
+  final ScrollController controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    print(equipos.length);
 
-    equipos = Provider.of<EquipoState>(context).filterListEquipo;
-
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       bottomNavigationBar: const BottomNavigator(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        child: ListView(
-          children: [
-            SvgPicture.asset(
-              "assets/logo.svg",
-              height: 35,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Buscar equipos..',
-                prefixIcon: Icon(Icons.search),
-                fillColor: Colors.white,
-                filled: true,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+          child: Column(
+            children: [
+              SvgPicture.asset(
+                "assets/logo.svg",
+                height: 30,
               ),
-              onChanged: (value) {
-                if (value == "") {
-                  Provider.of<EquipoState>(context, listen: false).setFilter(
-                      Provider.of<EquipoState>(context, listen: false).equipos);
-                } else {
-                  List<Equipo> equiposSearch =
-                      Provider.of<EquipoState>(context, listen: false)
-                          .equipos
-                          .where((element) =>
-                              element.id.toString().startsWith(value) ||
-                              element.tipo
-                                  .toLowerCase()
-                                  .startsWith(value.toLowerCase()) ||
-                              element.marca
-                                  .toLowerCase()
-                                  .startsWith(value.toLowerCase()) ||
-                              element.modelo
-                                  .toLowerCase()
-                                  .startsWith(value.toLowerCase()))
-                          .toList();
-                  Provider.of<EquipoState>(context, listen: false)
-                      .setFilter(equiposSearch);
-                }
-              },
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            (Provider.of<EquipoState>(context).loading)
-                ? Center(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Loading",
-                          style: TextStyle(color: dark, fontSize: 35),
-                        ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+                child: Container(
+                  height: 55,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar equipos..',
+                      prefixIcon: Icon(Icons.search),
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5)),
                     ),
-                  )
-                : SizedBox(
-                    height: 500,
-                    child: ListView.builder(
-                        itemCount: equipos?.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                              onTap: (){
-                                searchController.clear();
-                                FocusScope.of(context).unfocus();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            cardEquipoDetalle(equipo:  equipos![index])));
-                              },
-                              child: CardEquipo(equipo: equipos![index]));
-                        }),
+                    onChanged: (value) {
+                      if (value == "") {
+                        Provider.of<EquipoState>(context, listen: false)
+                            .setFilter(
+                                Provider.of<EquipoState>(context, listen: false)
+                                    .equipos);
+                      } else {
+                        List<Equipo> equiposSearch =
+                            Provider.of<EquipoState>(context, listen: false)
+                                .equipos
+                                .where((element) =>
+                                    element.id.toString().startsWith(value) ||
+                                    element.tipo
+                                        .toLowerCase()
+                                        .startsWith(value.toLowerCase()) ||
+                                    element.marca
+                                        .toLowerCase()
+                                        .startsWith(value.toLowerCase()) ||
+                                    element.modelo
+                                        .toLowerCase()
+                                        .startsWith(value.toLowerCase()))
+                                .toList();
+                        Provider.of<EquipoState>(context, listen: false)
+                            .setFilter(equiposSearch);
+                      }
+                    },
                   ),
-          ],
+                ),
+              ),
+              (equipos.isEmpty)
+                  ? Center(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Loading",
+                            style: TextStyle(color: dark, fontSize: 35),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Expanded(
+                    child: GridView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: equipos.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                          onTap: () {
+                            searchController.clear();
+                            FocusScope.of(context).unfocus();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        cardEquipoDetalle(
+                                            equipo: equipos[index]))
+
+                            ).then((value){
+
+                              Provider.of<EquipoState>(context, listen: false)
+                                  .setFilter(Provider.of<EquipoState>(context,listen: false).equipos);
+                            });
+                          },
+                          child: CardEquipo(equipo: equipos[index]));
+                    },
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+
+                        crossAxisCount: 2,crossAxisSpacing: 5,
+                      mainAxisSpacing: 5
+                    ),
+
+                      ),
+                  ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }
+//CardEquipo(equipo: equipos[index])
 
-
+/*
+*
+*   itemBuilder:  List.generate(equipos.length, (index)  {
+                            return GestureDetector(
+                                onTap: () {
+                                  searchController.clear();
+                                  FocusScope.of(context).unfocus();
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              cardEquipoDetalle(
+                                                  equipo: equipos[index])));
+                                },
+                                child: Column(mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 5.0),
+                                      child: CardEquipo(equipo: equipos[index]),
+                                    )
+                                  ],
+                                ));
+                          },),
+*
+* */

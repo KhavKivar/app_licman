@@ -1,7 +1,8 @@
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/state/commonVarState.dart';
-import 'package:app_licman/ui/acta_general_page.dart';
-import 'package:app_licman/ui/acta_page_view.dart';
+import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
+import 'package:app_licman/ui/ui_creacion_acta/acta_page_view.dart';
+import 'package:app_licman/ui/all_actas_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,13 +28,15 @@ class _BottomNavigatorState extends State<BottomNavigator> {
         return;
       }
       if(index == 0 ){
+        Provider.of<CommonState>(context, listen: false)
+            .changeActaIndex(0);
         Navigator.pop(context);
       }else if(index == 1){
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    ActaPageView()));
+                    TableOfActas()));
       }
       Provider.of<CommonState>(context,listen: false).changeIndex(index);
     });
@@ -57,8 +60,12 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Acta de inspeccion',
+            icon: Icon(Icons.content_paste),
+            label: 'Actas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Mas',
           ),
         ]);
   }

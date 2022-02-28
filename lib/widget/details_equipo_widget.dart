@@ -2,6 +2,8 @@ import 'package:app_licman/model/equipo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../const/Colors.dart';
+
 class DetalleEquipoWidget extends StatelessWidget {
 
 
@@ -16,7 +18,7 @@ class DetalleEquipoWidget extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.white,
 
-          border: Border.all(color:Colors.grey,width: 2),borderRadius:BorderRadius.circular(5) ),
+          border: Border.all(color:dark,width: 1),borderRadius:BorderRadius.circular(5) ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(children: [
@@ -85,7 +87,7 @@ class DetalleEquipoWidget extends StatelessWidget {
                       style:
                       TextStyle(fontSize: fontSizeTextRow)),
                   Text(
-                    equipoSelect.altura,
+                    equipoSelect.altura.toString(),
                     style: TextStyle(fontSize: fontSizeTextRow,color:Colors.black54),
                   ),
                 ],
@@ -99,7 +101,7 @@ class DetalleEquipoWidget extends StatelessWidget {
                       style:
                       TextStyle(fontSize: fontSizeTextRow)),
                   Text(
-                    equipoSelect.capacidad,
+                    equipoSelect.capacidad.toString(),
                     style: TextStyle(fontSize: fontSizeTextRow,color:Colors.black54),
                   ),
                 ],

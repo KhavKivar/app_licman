@@ -2,6 +2,7 @@
 //
 //     final welcome = welcomeFromJson(jsonString);
 
+import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -9,7 +10,8 @@ List<Equipo> welcomeFromJson(String str) => List<Equipo>.from(json.decode(str).m
 
 String welcomeToJson(List<Equipo> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Equipo {
+@HiveType(typeId: 0)
+class Equipo extends HiveObject{
   Equipo({
     required this.id,
     required this.tipo,
@@ -24,29 +26,50 @@ class Equipo {
     required this.precioNeto,
   });
 
+  @HiveField(0)
   int id;
+
+  @HiveField(1)
   String tipo;
+
+  @HiveField(2)
   String marca;
+
+  @HiveField(3)
   String modelo;
+
+  @HiveField(4)
   String serie;
-  String capacidad = "0";
+
+  @HiveField(5)
+  int capacidad = 0;
+
+  @HiveField(6)
   String mastil = "";
-  String altura = "0";
+
+  @HiveField(7)
+  double altura = 0.0;
+
+  @HiveField(8)
   int ano;
+
+  @HiveField(9)
   int horometro;
+
+  @HiveField(10)
   int precioNeto;
 
   factory Equipo.fromJson(Map<String, dynamic> json) => Equipo(
-    id: json["id"],
+    id: json["idEquipo"],
     tipo: json["tipo"],
     marca: json["marca"],
     modelo: json["modelo"],
     serie: json["serie"],
     capacidad: json["capacidad"],
-    mastil: json["mastil"],
-    altura: json["altura"],
+    mastil: json["mastil"] == null ?  "":json["mastil"] ,
+    altura:  json["altura"] == null ? 0.0 : json["altura"].toDouble(),
     ano: json["ano"],
-    horometro: json["horometro"],
+    horometro: json["horometro"] == null ? 0 : json["horometro"],
     precioNeto: json["precio_neto"],
   );
 

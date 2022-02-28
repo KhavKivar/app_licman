@@ -1,94 +1,487 @@
-import 'package:app_licman/services/inventario/equiposServices.dart';
-import 'package:flutter/material.dart';
+import 'package:app_licman/model/inspeccion.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../equipo.dart';
+import 'package:app_licman/plugins/dart_rut_form.dart';
+
+class AuxSelectItem {
+  String text;
+  String select;
+  String tipo;
+  List<String> options;
+  AuxSelectItem(this.text, this.select, this.tipo, this.options);
+}
+String? convertBoolToString(List<bool>? listValue){
+  if(listValue == null ){
+    return null;
+  }
+
+  if(listValue[0]){
+    return "bueno";
+  }else if(listValue[1]){
+    return "regular";
+  }return "malo";
+
+}
+
 
 class ActaState extends ChangeNotifier {
-  final acta_state = [
-    {
-      '': [false, false, false],
-      'Alarma retroceso': [false, false, false],
-      'Asiento operdor': [false, false, false],
-      'Baliza': [false, false, false],
-      'Bocina': [false, false, false],
-      'Extintor': [false, false, false],
-      'Espejos': [false, false, false],
-      'Focos faeneros delanteros': [false, false, false],
-      'Focos faeneros traseros': [false, false, false],
-      'LLave de contacto': [false, false, false],
-      'Intermitentes delanteros': [false, false, false],
-      'Intermitentes traseros': [false, false, false],
-      'Palanca freno mano': [false, false, false],
-      'Pera de volante': [false, false, false],
-      'Tablero instrumentos': [false, false, false],
+
+
+  final acta_electrica = {
+    "OPTION_SELECT": {
+      'Carro y su respaldo de carga':
+          AuxSelectItem("Respaldo de carga", "NO", "select", ["SI", "NO"]),
+      'Bateria': AuxSelectItem("Observaciones", "", "text", []),
+      'Serie cargador': AuxSelectItem("Serie", "", "text", []),
+      'Cargador voltaje y amperaje':
+          AuxSelectItem("Voltaje", "48V", "select", ["48V", "24V"]),
+      'Enchufes': AuxSelectItem("Tipo enchufe", "16V POLO 4", "select",
+          ["16V POLO 4", "16V POLO 5", "32V POLO 4", "32V POLO 5"]),
     },
-    {
-      '': [false, false, false],
-      'Cilindro desplazador': [false, false, false],
-      'Cilindro direccion cadena': [false, false, false],
-      'Cilindro levante central': [false, false, false],
-      'Cilindro inclinacion': [false, false, false],
-      'Cilindro levante laterales': [false, false, false],
-      'Flexibles hidraulicas': [false, false, false],
-      'Fuga por conectores y mangueras': [false, false, false],
+    "TEXT_CAMP": {
+      'Espejos': "0",
+      'Focos faeneros delanteros': "0",
+      'Focos faeneros traseros': "0",
+      'LLave de contacto': "0",
+      'Intermitentes delanteros': "0",
+      'Intermitentes traseros': "0",
+      'Ruedas': "0",
     },
-    {
-      '': [false, false, false],
-      'Bateria': [false, false, false],
-      'Chapa de contacto': [false, false, false],
-      'Sistema electrico': [false, false, false],
-      'Horometro': [false, false, false],
-      'Palanca comandos': [false, false, false],
-      'Switch de luces': [false, false, false],
-      'Switch de marchas': [false, false, false],
-      'Joystick': [false, false, false],
+    "SELECT_CAMP": [
+      {
+        '': [false, false, false],
+        'Alarma retroceso': [false, false, false],
+        'Asiento operdor': [false, false, false],
+        'Baliza': [false, false, false],
+        'Bocina': [false, false, false],
+        'Extintor': [false, false, false],
+        'Espejos': [false, false, false],
+        'Focos faeneros delanteros': [false, false, false],
+        'Focos faeneros traseros': [false, false, false],
+        'LLave de contacto': [false, false, false],
+        'Intermitentes delanteros': [false, false, false],
+        'Intermitentes traseros': [false, false, false],
+        'Palanca freno mano': [false, false, false],
+        'Pera de volante': [false, false, false],
+        'Tablero instrumentos': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Cilindro desplazador': [false, false, false],
+        'Cilindro direccion cadena': [false, false, false],
+        'Cilindro levante central': [false, false, false],
+        'Cilindro inclinacion': [false, false, false],
+        'Cilindro levante laterales': [false, false, false],
+        'Flexibles hidraulicas': [false, false, false],
+        'Fuga por conectores y mangueras': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Bateria': [false, false, false],
+        'Chapa de contacto': [false, false, false],
+        'Sistema electrico': [false, false, false],
+        'Horometro': [false, false, false],
+        'Motor de partida': [false, false, false],
+        'Palanca comandos': [false, false, false],
+        'Switch de luces': [false, false, false],
+        'Switch de marchas': [false, false, false],
+        'Joystick': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Cadenas': [false, false, false],
+        'Carro y su respaldo de carga': [false, false, false],
+        'Horquillas y seguros': [false, false, false],
+        'Jaula de proteccion': [false, false, false],
+        'LLantas': [false, false, false],
+        'Mastil': [false, false, false],
+        'Pintura': [false, false, false],
+        'Ruedas': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Desplazador lateral': [false, false, false],
+        'Direccion': [false, false, false],
+        'Freno mano': [false, false, false],
+        'Freno pie': [false, false, false],
+        'Inclinacion': [false, false, false],
+        'Levante': [false, false, false],
+        'Nivel aceite hidraulico': [false, false, false],
+        'Serie cargador': [false, false, false],
+        'Nivel liquido de freno': [false, false, false],
+        'Cargador voltaje y amperaje': [false, false, false],
+        'Enchufes': [false, false, false],
+      }
+    ]
+  };
+  final acta_equipo = {
+    "OPTION_SELECT": {
+      "Arnes de cilindro de gas":
+          AuxSelectItem("Cilindro de gas", "NO", "select", ["SI", "NO"]),
+      'Carro y su respaldo de carga':
+          AuxSelectItem("Respaldo de carga", "NO", "select", ["SI", "NO"])
     },
-    {
-      '': [false, false, false],
-      'Cadenas': [false, false, false],
-      'Carro y su respaldo de carga': [false, false, false],
-      'Horquillas y seguros': [false, false, false],
-      'Jaula de proteccion': [false, false, false],
-      'LLantas': [false, false, false],
-      'Mastil': [false, false, false],
-      'Pintura': [false, false, false],
-      'Ruedas': [false, false, false],
+    "TEXT_CAMP": {
+      'Espejos': "0",
+      'Focos faeneros delanteros': "0",
+      'Focos faeneros traseros': "0",
+      'LLave de contacto': "0",
+      'Intermitentes delanteros': "0",
+      'Intermitentes traseros': "0",
+      'Ruedas': "0",
     },
-    {
-      '': [false, false, false],
-      'Desplazador lateral': [false, false, false],
-      'Direccion': [false, false, false],
-      'Freno mano': [false, false, false],
-      'Inclinacion': [false, false, false],
-      'Levante': [false, false, false],
-      'Nivel aceite hidraulico': [false, false, false],
-      'Serie cargador': [false, false, false],
-      'Nivel liquido de freno': [false, false, false],
-      'Cargador voltaje y amperaje': [false, false, false],
-      'Enchufes': [false, false, false],
+    "SELECT_CAMP": [
+      {
+        '': [false, false, false],
+        'Alarma retroceso': [false, false, false],
+        'Asiento operdor': [false, false, false],
+        'Baliza': [false, false, false],
+        'Bocina': [false, false, false],
+        'Extintor': [false, false, false],
+        'Espejos': [false, false, false],
+        'Focos faeneros delanteros': [false, false, false],
+        'Focos faeneros traseros': [false, false, false],
+        'LLave de contacto': [false, false, false],
+        'Intermitentes delanteros': [false, false, false],
+        'Intermitentes traseros': [false, false, false],
+        'Palanca freno mano': [false, false, false],
+        'Pera de volante': [false, false, false],
+        'Arnes de cilindro de gas': [false, false, false],
+        'Tablero instrumentos': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Cilindro desplazador': [false, false, false],
+        'Cilindro direccion': [false, false, false],
+        'Cilindro levante central': [false, false, false],
+        'Cilindro inclinacion': [false, false, false],
+        'Cilindro levante laterales': [false, false, false],
+        'Flexibles hidraulicas': [false, false, false],
+        'Fuga por conectores y mangueras': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Alternador': [false, false, false],
+        'Bateria': [false, false, false],
+        'Chapa de contacto': [false, false, false],
+        'Sistema electrico': [false, false, false],
+        'Horometro': [false, false, false],
+        'Motor de partida': [false, false, false],
+        'Palanca comandos': [false, false, false],
+        'Switch de luces': [false, false, false],
+        'Switch de marchas': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Cadenas': [false, false, false],
+        'Carro y su respaldo de carga': [false, false, false],
+        'Horquillas y seguros': [false, false, false],
+        'Jaula de proteccion': [false, false, false],
+        'LLantas': [false, false, false],
+        'Mastil': [false, false, false],
+        'Pintura': [false, false, false],
+        'Ruedas': [false, false, false],
+      },
+      {
+        '': [false, false, false],
+        'Desplazador lateral': [false, false, false],
+        'Direccion': [false, false, false],
+        'Freno mano': [false, false, false],
+        'Freno pie': [false, false, false],
+        'Inclinacion': [false, false, false],
+        'Levante': [false, false, false],
+        'Motor': [false, false, false],
+        'Nivel aceite hidraulico': [false, false, false],
+        'Nivel aceite motor': [false, false, false],
+        'Nivel aceite transmision': [false, false, false],
+        'Nivel liquido de freno': [false, false, false],
+        'Tapa combustible': [false, false, false],
+        'Tapa radiador': [false, false, false],
+        'Transmision': [false, false, false],
+      }
+    ]
+  };
+
+  late final MapOfValue;
+  Inspeccion convertMapToObject(String signUrl) {
+    Inspeccion acta = Inspeccion();
+    acta.tipo = MapOfValue['tipo'] ? "acta_equipo":"acta_electrica";
+
+    acta.idEquipo = int.parse(MapOfValue['id']);
+    acta.rut = MapOfValue['rut'].replaceAll(".", "");
+    acta.nombre = MapOfValue['name'];
+    acta.observacion = MapOfValue['obv'];
+    acta.alturaLevante = MapOfValue['alturaLevante'];
+    acta.horometroActual = int.parse(MapOfValue['horometroActual']);
+    acta.firmaUrl = signUrl;
+
+
+    //1 camp
+    acta.alarmaRetroceso = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Alarma retroceso']);
+    acta.asientoOperador = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Asiento operdor']);
+    acta.baliza = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Baliza']);
+    acta.bocina = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Bocina']);
+    acta.extintor = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Extintor']);
+    acta.espejos = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Espejos']);
+    acta.focosFaenerosDelanteros = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Focos faeneros delanteros']);
+    acta.focosFaenerosTraseros = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Focos faeneros traseros']);
+    acta.llaveContacto = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['LLave de contacto']);
+    acta.intermitentesDelanteros = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Intermitentes delanteros']);
+    acta.intermitentesTraseros = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Focos faeneros traseros']);
+    acta.palancaFrenoMano = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Palanca freno mano']);
+    acta.peraVolante = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Pera de volante']);
+    acta.arnesCilindroGas = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Pera de volante']);
+    acta.tableroIntrumentos = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][0]['Tablero instrumentos']);
+
+    // 2 camp
+
+
+    acta.cilindroDesplazador = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro desplazador']);
+    if(acta.tipo == "acta_equipo"){
+      acta.cilindroDireccion = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro direccion']);
+    }else{
+      acta.cilindroDireccion = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro direccion cadena']);
     }
-  ];
-  setValue(int position, String key,int boolPosition,bool value){
-    acta_state[position][key]![boolPosition]  = value;
+
+    acta.cilindroLevanteCentral= convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro levante central']);
+    acta.cilindroInclinacion = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro inclinacion']);
+    acta.cilindroLevanteLateral = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Cilindro levante laterales']);
+    acta.flexibleHidraulico = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Flexibles hidraulicas']);
+    acta.fugaConectores = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][1]['Fuga por conectores y mangueras']);
+
+    //3 camp
+    acta.alternador = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Alternador']);
+    acta.bateria = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Bateria']);
+    acta.chapaContacto= convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Chapa de contacto']);
+    acta.sistemaElectrico = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Sistema electrico']);
+    acta.horometro = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Horometro']);
+    acta.motorPartida = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Motor de partida']);
+    acta.palancaComando = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Palanca comandos']);
+    acta.switchLuces = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Switch de luces']);
+    acta.switchMarcha = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Switch de marchas']);
+    acta.joystick = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][2]['Joystick']);
+    //4 camp
+
+    acta.cadena = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Cadenas']);
+    acta.carro = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Carro y su respaldo de carga']);
+    acta.horquilla= convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Horquillas y seguros']);
+    acta.jaula = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Jaula de proteccion']);
+    acta.llantas = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['LLantas']);
+    acta.mastil = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Mastil']);
+    acta.pintura = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Pintura']);
+    acta.rueda = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][3]['Ruedas']);
+
+
+    //5 camp
+
+    acta.desplazadorLateral = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Desplazador lateral']);
+    acta.direccion = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Direccion']);
+    acta.frenoMano= convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Freno mano']);
+    acta.frenoPie = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Freno pie']);
+    acta.inclinacion = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Inclinacion']);
+    acta.levante = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Levante']);
+    acta.motor = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Motor']);
+    acta.nivelAceiteHidraulico = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Nivel aceite hidraulico']);
+    acta.nivelAceiteMotor = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Nivel aceite motor']);
+    acta.nivelAceiteTransmision = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Nivel aceite transmision']);
+    acta.nivelLiquinoFreno = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Nivel liquido de freno']);
+    acta.tapaCombustible = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Tapa combustible']);
+    acta.tapaRadiador = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Tapa radiador']);
+    acta.transmision = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Transmision']);
+    acta.serieCargador =convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Serie cargador']);
+
+    acta.cargadorVoltaje = convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Cargador voltaje y amperaje']);
+    acta.enchufe =  convertBoolToString(MapOfValue['ACTA']['SELECT_CAMP'][4]['Enchufes']);
+
+
+    acta.carga = MapOfValue['ACTA']['OPTION_SELECT']['Carro y su respaldo de carga'].select =="SI"? 1:0;
+    if(acta.tipo == "acta_equipo"){
+
+      acta.cilindroDeGas = MapOfValue['ACTA']['OPTION_SELECT']['Arnes de cilindro de gas'].select =="SI"? 1:0;
+
+    }else{
+      acta.bateriaObservaciones = MapOfValue['ACTA']['OPTION_SELECT']['Bateria'].select;
+      acta.serieCargardorText = MapOfValue['ACTA']['OPTION_SELECT']['Serie cargador'].select;
+      acta.cargadorVoltajeInfo = MapOfValue['ACTA']['OPTION_SELECT']['Cargador voltaje y amperaje'].select  =="48V"? "48":"24";
+      var enchufeText =  MapOfValue['ACTA']['OPTION_SELECT']["Enchufes"].select.split("V")[0]+"-"+
+          MapOfValue['ACTA']['OPTION_SELECT']["Enchufes"].select[MapOfValue['ACTA']['OPTION_SELECT']["Enchufes"].select.length -1];
+      acta.enchufeInfo =enchufeText;
+    }
+
+
+    //Cantidad Camp
+
+    acta.cantidadRueda = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Ruedas']);
+    acta.cantidadIntermitentesDelanteros = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Intermitentes delanteros']);
+    acta.cantidadIntermitentesTraseros = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Intermitentes traseros']);
+    acta.cantidadLlaveContacto = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['LLave de contacto']);
+    acta.cantidadFocosFaenerosDelanteros = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Focos faeneros delanteros']);
+    acta.cantidadFocosFaenerosTraseros = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Focos faeneros traseros']);
+    acta.cantidadEspejos = int.parse(MapOfValue['ACTA']['TEXT_CAMP']['Espejos']);
+
+
+
+    return acta;
+  }
+  init(){
+    MapOfValue = {
+      "id": "",
+      "rut": "19.434.752-9",
+      "name": "sebastian",
+      "obv": "test",
+      "equipo": null,
+      "alturaLevante": "0",
+      "horometroActual": "0",
+      "tipo": true,
+      "ACTA": acta_equipo
+    };
+  }
+
+
+  initMap(bool tipoValue) {
+    if (tipoValue) {
+      MapOfValue['ACTA'] = acta_equipo;
+    } else {
+      MapOfValue['ACTA'] = acta_electrica;
+
+    }
     notifyListeners();
   }
-  changeAllColumn(int position, int columnInt,bool value) {
-    for (var i = 0; i < acta_state[position].length; i++) {
-      var keyAux = acta_state[position].keys.elementAt(i);
+  setHorometroActual(String value){
+    MapOfValue['horometroActual'] = value;
+    notifyListeners();
+  }
+
+  setAlturaLevante(String text) {
+    MapOfValue['alturaLevante'] = text;
+    notifyListeners();
+  }
+  setTipo(bool newTipo){
+    MapOfValue['tipo'] = newTipo;
+    initMap(newTipo);
+    notifyListeners();
+  }
+
+  setRut(String newRut) {
+    //Formatiarlo automaticamente
+    MapOfValue['rut'] = RUTValidator.formatFromText(newRut);
+    notifyListeners();
+  }
+
+  setName(String newName) {
+    MapOfValue['name'] = newName;
+    notifyListeners();
+  }
+
+  setObv(String newObv) {
+    MapOfValue['obv'] = newObv;
+    notifyListeners();
+  }
+
+  setEquipo(Equipo newEquipoSelect) {
+    MapOfValue['equipo'] = newEquipoSelect;
+    notifyListeners();
+  }
+
+  setId(String newId) {
+    MapOfValue['id'] = newId;
+    notifyListeners();
+  }
+
+
+
+  setFieldSpecialBateria(String text) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Bateria'].select = text;
+    notifyListeners();
+  }
+
+  setFieldSpecialCargadorVoltaje(String text) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Cargador voltaje y amperaje'].select = text;
+    notifyListeners();
+  }
+
+  setFiedlsSpecialEnchufe(String text) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Enchufes'].select = text;
+    notifyListeners();
+  }
+
+  setFieldSerieCargador(String text) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Serie cargador'].select = text;
+    notifyListeners();
+  }
+
+  setFieldSpecialRespaldoElectrico(String opcion) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Carro y su respaldo de carga'].select = opcion;
+    notifyListeners();
+  }
+
+  setFieldSpecialRespaldoEquipo(String opcion) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Carro y su respaldo de carga'].select = opcion;
+    notifyListeners();
+  }
+
+  setFieldSpecialArnes(String opcion) {
+    MapOfValue['ACTA']['OPTION_SELECT']['Arnes de cilindro de gas'].select = opcion;
+    notifyListeners();
+  }
+
+  setEspejos(String espejos) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Espejos'] = espejos;
+    notifyListeners();
+  }
+
+  setFocosD(String focosD) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Focos faeneros delanteros'] = focosD;
+    notifyListeners();
+  }
+
+  setFocosT(String focosT) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Focos faeneros traseros'] = focosT;
+
+    notifyListeners();
+  }
+
+  setLlave(String llave) {
+    MapOfValue['ACTA']['TEXT_CAMP']['LLave de contacto'] = llave;
+    notifyListeners();
+  }
+
+  setInterD(String interD) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Intermitentes delanteros'] = interD;
+
+    notifyListeners();
+  }
+
+  setInterT(String interT) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Intermitentes traseros'] = interT;
+    notifyListeners();
+  }
+
+  setRuedas(String rueda) {
+    MapOfValue['ACTA']['TEXT_CAMP']['Ruedas'] = rueda;
+    notifyListeners();
+  }
+
+
+  setValue(int position, String key, int boolPosition, bool value) {
+    MapOfValue['ACTA']['SELECT_CAMP'][position][key]![boolPosition] = value;
+    notifyListeners();
+  }
+
+  changeAllColumn(int position, int columnInt, bool value) {
+    for (var i = 0; i < MapOfValue['ACTA']['SELECT_CAMP'][position].length; i++) {
+      var keyAux = MapOfValue['ACTA']['SELECT_CAMP'][position].keys.elementAt(i);
       if (columnInt == 0) {
-        print("hey");
-        print(value);
-        acta_state[position][keyAux] = [value, false, false];
+        MapOfValue['ACTA']['SELECT_CAMP'][position][keyAux] = [value, false, false];
       }
       if (columnInt == 1) {
-        acta_state[position][keyAux] = [ false, value, false];
-      } if(columnInt ==2) {
-        acta_state[position][keyAux] = [false, false, value];
+        MapOfValue['ACTA']['SELECT_CAMP'][position][keyAux] = [false, value, false];
+      }
+      if (columnInt == 2) {
+        MapOfValue['ACTA']['SELECT_CAMP'][position][keyAux] = [false, false, value];
       }
     }
     notifyListeners();
-  }
-  get_value(){
-    return acta_state;
   }
 }
