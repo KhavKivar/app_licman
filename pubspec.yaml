@@ -45,8 +45,11 @@ dependencies:
   transparent_image: ^2.0.0
   flutter_multi_formatter: ^2.5.1
   cached_network_image: ^3.2.0
-  hive: ^2.0.6
+  hive: ^2.0.4
   hive_flutter: ^1.1.0
+  keyboard_actions: ^3.4.7
+
+
   smart_select: ^4.3.2
 
 
@@ -55,6 +58,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator: ^1.1.1
+  build_runner: ^2.1.5
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -2,7 +2,6 @@ import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/state/commonVarState.dart';
 import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
 import 'package:app_licman/ui/ui_creacion_acta/acta_general_part_2_page.dart';
-import 'package:app_licman/ui/ui_creacion_acta/acta_general_part_3_page.dart';
 
 import 'package:app_licman/widget/bottomNavigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,20 +22,16 @@ class _ActaPageViewState extends State<ActaPageView> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(backgroundColor: dark,title: Text("Creacion de acta",style: TextStyle(
 
+        ),),),
         body: Stack(
           children: [
 
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0.0),
-              child: IconButton(onPressed: (){
-                Navigator.pop(context);
-              }, icon: Icon(Icons.arrow_back,size: 35,color: dark,)),
-            ),
             Column(
               children: [
                 Padding(
-                    padding: const EdgeInsets.only(left: 50,right:50,top: 40),
+                    padding: const EdgeInsets.only(left: 30,right:30,top: 10),
                     child: TopNavigator(
                       controller: controller,
                     )),
@@ -49,7 +44,7 @@ class _ActaPageViewState extends State<ActaPageView> {
                         child: ActaGeneral(),
                       ),
                       actaGeneralPartTwo(),
-                      ActaGeneralPartThree(),
+
                     ],
                   ),
                 ),
@@ -77,7 +72,7 @@ class _TopNavigatorState extends State<TopNavigator> {
     select = Provider.of<CommonState>(context).actaSelectItem;
   }
 
-  final double fontSizeNav = 15;
+  final double fontSizeNav = 20;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -105,8 +100,8 @@ class _TopNavigatorState extends State<TopNavigator> {
                       bottomLeft: Radius.circular(5),
                     )),
                 child: RowNavigator(
-                  iconData: Icons.assignment,
-                  title: "Acta de inspeccion",
+                  iconData: Icons.content_paste,
+                  title: "Acta",
                   fontSizeText: fontSizeNav,
                 )),
           )),
@@ -130,30 +125,7 @@ class _TopNavigatorState extends State<TopNavigator> {
                   fontSizeText: fontSizeNav,
                 )),
           )),
-          Expanded(
-              child: GestureDetector(
-            onTap: () {
-              Provider.of<CommonState>(context, listen: false)
-                  .changeActaIndex(2);
-              widget.controller.animateToPage(2,
-                  duration: Duration(milliseconds: 400),
-                  curve: Curves.easeInOut);
-            },
-            child: Container(
-              height: double.infinity,
-              decoration: BoxDecoration(
-                  color: select == 2 ? Colors.blueAccent : dark,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(5),
-                    bottomRight: Radius.circular(5),
-                  )),
-              child: RowNavigator(
-                iconData: Icons.edit,
-                title: "Firma",
-                fontSizeText: fontSizeNav,
-              ),
-            ),
-          ))
+
         ],
       ),
     );
@@ -197,3 +169,29 @@ class RowNavigator extends StatelessWidget {
     );
   }
 }
+/*
+*   Expanded(
+              child: GestureDetector(
+            onTap: () {
+              Provider.of<CommonState>(context, listen: false)
+                  .changeActaIndex(2);
+              widget.controller.animateToPage(2,
+                  duration: Duration(milliseconds: 400),
+                  curve: Curves.easeInOut);
+            },
+            child: Container(
+              height: double.infinity,
+              decoration: BoxDecoration(
+                  color: select == 2 ? Colors.blueAccent : dark,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(5),
+                    bottomRight: Radius.circular(5),
+                  )),
+              child: RowNavigator(
+                iconData: Icons.edit,
+                title: "Firma",
+                fontSizeText: fontSizeNav,
+              ),
+            ),
+          ))
+* */

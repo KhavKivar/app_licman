@@ -6,12 +6,14 @@ import 'package:app_licman/model/state/equipoState.dart';
 
 import 'package:app_licman/widget/bottomNavigator.dart';
 import 'package:app_licman/widget/card_equipo_widget.dart';
+import 'package:app_licman/widget/drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 
+import '../Repository/updateResourcesRepository.dart';
 import 'ui_creacion_acta/acta_general_page.dart';
 import 'card_equipo_detalle.dart';
 
@@ -33,7 +35,12 @@ class HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
 
-    Provider.of<EquipoState>(context, listen: false).initState(context);
+    Provider.of<EquipoState>(context, listen: false).initState(context).then((x){
+      Future.delayed(Duration(milliseconds: 1)).then((value){
+        UpdateStateRepository().update(context);
+      });
+
+    });
     Provider.of<ActaState>(context, listen: false).init();
   }
 
@@ -59,6 +66,7 @@ class HomepageState extends State<Homepage> {
 
     return Scaffold(
       bottomNavigationBar: const BottomNavigator(),
+      drawer: MyDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),

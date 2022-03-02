@@ -9,16 +9,15 @@ import 'package:http/http.dart' as http;
 
 Future<Inspeccion?> sendActa(Inspeccion acta) async {
   final url = Uri.parse(Strings.urlServerPostInps);
-
   try {
     final response = await http.post(url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(acta.toJson()));
-    log(response.body);
     return Inspeccion.fromJson(json.decode(response.body));
   } catch (e) {
+    print(e);
     return null;
   }
 }

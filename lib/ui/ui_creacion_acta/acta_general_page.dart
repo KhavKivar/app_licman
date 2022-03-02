@@ -87,11 +87,11 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
             )
           : Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 50),
+                const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
                 const SizedBox(
-                  height: 20,
+                  height: 15,
                 ),
                 Column(
                   children: [
@@ -219,7 +219,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                       fillColor: Colors.white,
                                       filled: true,
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black12, width: 1.0),
+                                        borderSide: BorderSide(color: Colors.blueAccent, width: 1.0),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(color: Colors.black, width: 1),
@@ -253,7 +253,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                       fillColor: Colors.white,
                                       filled: true,
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black12, width: 1.0),
+                                        borderSide: BorderSide(color: Colors.blueAccent, width: 1.0),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(color: Colors.black, width:1 ),
@@ -273,9 +273,8 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                           Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-
                               border: Border.all(color:Colors.black,width: 1),
-                              borderRadius: BorderRadius.circular(10)
+                              borderRadius: BorderRadius.circular(5)
                             ),
                             child: TextButton(
                               onPressed: () {
@@ -293,7 +292,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                     MainAxisAlignment.center,
                                 children:  [
                                   Icon(
-                                    Icons.assignment,
+                                    Icons.content_paste,
                                     color: Colors.black,
                                     size: 30,
                                   ),

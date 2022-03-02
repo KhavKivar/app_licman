@@ -55,7 +55,7 @@ class GenerateImageUrl {
         success = result['success'];
         message = result['message'];
 
-        if (response.statusCode == 200) {
+        if (response.statusCode == 201) {
           isGenerated = true;
           uploadUrl = result["uploadUrl"];
           downloadUrl = result["downloadUrl"];

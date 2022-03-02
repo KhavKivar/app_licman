@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/inspeccion.dart';
 
@@ -9,8 +11,9 @@ import 'package:transparent_image/transparent_image.dart';
 import '../ui_creacion_acta/acta_page_view.dart';
 
 class ActaOnlyView extends StatefulWidget {
-  const ActaOnlyView({Key? key, required this.inspeccion}) : super(key: key);
+  const ActaOnlyView({Key? key, required this.inspeccion, this.data}) : super(key: key);
   final Inspeccion inspeccion;
+  final Uint8List? data;
   @override
   _ActaOnlyViewState createState() => _ActaOnlyViewState();
 }
@@ -285,7 +288,15 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
   void dispose() {
     super.dispose();
   }
-
+  List<String> itemsTitle = [
+    "ACCESORIOS",
+    "SISTEMA HIDRAULICO",
+    "SISTEMA ELECTRICO",
+    "CHASIS ESTRUCTURA",
+    "PRUEBAS DE OPERACION",
+    "FIRMA Y OBSERVACIONES"
+  ];
+  String dropdownValue = 'ACCESORIOS';
   Map<String, IconData> itemsIcons = {
     "ACCESORIOS": Icons.assignment,
     "SISTEMA HIDRAULICO": Icons.biotech,
@@ -330,54 +341,70 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                 )
               : Column(
                   children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15, top: 20),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(),
-                        child: Wrap(
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(
-                                  Icons.arrow_back,
-                                  size: 35,
-                                  color: dark,
-                                )),
-                            for (var k in itemsFromTitle.keys)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 5.0, right: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      controller.animateToPage(
-                                          itemsPageView[selectPage]!,
-                                          duration: Duration(milliseconds: 400),
-                                          curve: Curves.fastOutSlowIn);
-                                      selectPage = k;
-                                    });
+                    Container(
+                      decoration: BoxDecoration(
+                        color: dark,
+
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: dark,
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
                                   },
-                                  child: Container(
-                                      height: 40,
-                                      width: 300,
-                                      decoration: BoxDecoration(
-                                          color: selectPage == k
-                                              ? Colors.blueAccent
-                                              : dark,
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: RowNavigator(
-                                        iconData: itemsIcons[k]!,
-                                        title: k,
-                                        fontSizeText: 22,
-                                      )),
+                                  icon: Icon(
+                                    Icons.arrow_back,
+                                    size: 30,
+                                    color: Colors.white,
+                                  )),
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: dropdownValue,
+                                    icon: const Icon(Icons.arrow_downward,color: Colors.white,),
+                                    elevation: 8,
+                                    underline: Container(
+                                      height: 0,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    style: const TextStyle(color: Colors.white,fontSize: 23),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        dropdownValue = newValue!;
+                                        setState(() {
+                                          controller.animateToPage(itemsPageView[newValue]!,
+                                              duration: Duration(milliseconds: 400),
+                                              curve: Curves.easeInOut);
+                                          selectPage=newValue;
+                                        });
+                                      });
+                                    },
+                                    items: itemsTitle
+                                        .map<DropdownMenuItem<String>>((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Row(
+                                          children: [
+                                            Icon(itemsIcons[value],color: Colors.white,size: 30,),
+                                            const SizedBox(width: 10,),
+                                            Text(value),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -394,7 +421,7 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                                     ? Flexible(
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 15),
+                                              horizontal: 15,vertical: 10),
                                           child: Container(
                                             width: double.infinity,
                                             decoration: BoxDecoration(
@@ -409,7 +436,7 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                                                   const SizedBox(
                                                     height: 30,
                                                   ),
-                                                  SizedBox(
+                                                  widget.data == null ?  SizedBox(
                                                     height: 200,
                                                     child: FadeInImage
                                                         .memoryNetwork(
@@ -418,7 +445,13 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                                                       image: widget
                                                           .inspeccion.firmaUrl!,
                                                     ),
-                                                  ),
+                                                  ) :
+                                                 SizedBox(
+                                                    height: 200,
+                                                    child:  Image.memory(widget.data!)
+                                                    ),
+
+
                                                   const SizedBox(
                                                     height: 20,
                                                   ),
@@ -495,19 +528,28 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                                                         child: Row(
                                                       children: [
                                                         Expanded(
-                                                            child: Row(
+                                                            child: Align(
+                                                              alignment:Alignment.topLeft,
+                                                              child: FittedBox(
+                                                                fit:BoxFit.scaleDown,
+                                                                child: Row(
                                                           children: [
+                                                                const SizedBox(
+                                                                  width: 15,
+                                                                ),
+                                                                Text(
+                                                                  key,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          fontSizeTextRow),
+                                                                ),
                                                             const SizedBox(
-                                                              width: 15,
-                                                            ),
-                                                            Text(
-                                                              key,
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      fontSizeTextRow),
+                                                              width: 20,
                                                             ),
                                                           ],
-                                                        )),
+                                                        ),
+                                                              ),
+                                                            )),
                                                         Row(
                                                           children: [
                                                             if (newFieldsMap[

@@ -1,8 +1,10 @@
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/inspeccion.dart';
+import 'package:app_licman/model/state/commonVarState.dart';
 import 'package:app_licman/model/state/equipoState.dart';
 import 'package:app_licman/plugins/dart_rut_form.dart';
 import 'package:app_licman/widget/bottomNavigator.dart';
+import 'package:app_licman/widget/drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,236 +32,327 @@ class _TableOfActasState extends State<TableOfActas> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    inspecciones = Provider.of<EquipoState>(context).inspeccionList;
+    filterList = [...inspecciones];
   }
 
   @override
   void initState() {
     super.initState();
-    inspecciones =
-        Provider.of<EquipoState>(context, listen: false).inspeccionList;
-    filterList = [...inspecciones];
+  }
+
+  String dropdownValue = 'Actas';
+  List<String> itemsTitle = [
+    "Actas",
+    "Movimientos",
+  ];
+  Map<String, IconData> itemsIcons = {
+    "Actas": Icons.content_paste,
+    "Movimientos": Icons.swap_vert,
+  };
+  int? sortColumnIndex;
+  void onSort(int columnIndex, bool ascending) {
+    Map<int, String> columnsTable = {
+      0: 'Acta Id',
+      1: 'ID equipo',
+      2: 'Rut cliente',
+      3: 'Altura de levante',
+      4: 'Fecha'
+    };
+    List<int> listaActual =
+        Provider.of<CommonState>(context, listen: false).categories;
+    setState(() {
+      if (columnIndex == 0) {
+        filterList.sort((x1, x2) =>
+            compareString(ascending, x1.idInspeccion!, x2.idInspeccion!));
+      }
+    });
+  }
+
+  int compareString(bool ascending, int value1, int value2) {
+    return ascending ? value1.compareTo(value2) : value2.compareTo(2);
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return SafeArea(
-      child: Scaffold(
-        bottomNavigationBar: const BottomNavigator(),
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blueAccent,
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ActaPageView()),
-              );
-            }),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 50),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: (!showFilter)
-                          ? BorderRadius.all(Radius.circular(5))
-                          : BorderRadius.only(
-                              topLeft: Radius.circular(5),
-                              topRight: Radius.circular(5)),
-                      color: Colors.white),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Buscar acta..',
-                      hintStyle: TextStyle(fontSize: 21),
-                      prefixIcon: Icon(Icons.search),
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              showFilter = !showFilter;
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.filter_alt_outlined,
-                            color: Colors.black,
-                            size: 25,
-                          )),
+    var provSelectState = Provider.of<CommonState>(context).categories;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Actas y movimientos"),
+        backgroundColor: dark,
+      ),
+      drawer: MyDrawer(),
+      bottomNavigationBar: const BottomNavigator(),
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.blueAccent,
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ActaPageView()),
+            );
+          }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
                     ),
-                    onChanged: (value) {
-                      print(value);
-
-                      setState(() {
-                        filterList = inspecciones
-                            .where((element) => element.idEquipo
-                                .toString()
-                                .startsWith(value.toLowerCase()))
-                            .toList();
-                        print(filterList);
-                      });
-                      /*
-                           element.idInspeccion.toString().startsWith(value.toLowerCase())
-                              ||
-
-                              ||
-                              element.rut!.startsWith(value.toLowerCase())||
-                              RUTValidator.deFormat(element.rut!).startsWith(value.toLowerCase())
-
-                        * */
-                    },
-                  ),
-                ),
-                if (showFilter)
-                  Column(
-                    children: [
-                      const Divider(
-                        height: 0.3,
-                        thickness: 0.6,
-                        color: Colors.black87,
-                      ),
-                      FilterPanelWidget(),
-                    ],
-                  ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Center(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          width: 1,
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: (!showFilter)
+                              ? BorderRadius.all(Radius.circular(25))
+                              : BorderRadius.only(
+                                  topLeft: Radius.circular(5),
+                                  topRight: Radius.circular(5)),
+                          color: Colors.white),
+                      child: TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Buscar acta..',
+                          hintStyle: TextStyle(fontSize: 21),
+                          prefixIcon: Icon(Icons.search),
+                          fillColor: Colors.white,
+                          filled: true,
+                          suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  showFilter = !showFilter;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.filter_alt_outlined,
+                                color: dark,
+                                size: 25,
+                              )),
                         ),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                        onChanged: (value) {
+                          print(value);
+
+                          setState(() {
+                            filterList = inspecciones;
+                            var filtros =
+                                Provider.of<CommonState>(context, listen: false)
+                                    .listaFiltro;
+
+                            switch (filtros) {
+                              case 0:
+                                {
+                                  filterList = filterList
+                                      .where((element) => element.idInspeccion
+                                          .toString()
+                                          .startsWith(value.toLowerCase()))
+                                      .toList();
+                                }
+                                break;
+                              case 1:
+                                {
+                                  filterList = filterList
+                                      .where((element) => element.idEquipo
+                                          .toString()
+                                          .startsWith(value.toLowerCase()))
+                                      .toList();
+                                }
+                                break;
+                              case 2:
+                                {
+                                  filterList = filterList
+                                      .where((element) =>
+                                          element.rut!.startsWith(
+                                              value.toLowerCase()) ||
+                                          RUTValidator.deFormat(element.rut!)
+                                              .startsWith(value.toLowerCase()))
+                                      .toList();
+                                }
+                                break;
+
+                              case 3:
+                                {
+                                  filterList = filterList
+                                      .where((element) => element.ts
+                                          .toString()
+                                          .startsWith(value.toLowerCase()))
+                                      .toList();
+                                }
+                                break;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                    if (showFilter)
+                      Column(
+                        children: [
+                          const Divider(
+                            height: 0.3,
+                            thickness: 0.6,
+                            color: Colors.black87,
+                          ),
+                          FilterPanelWidget(),
+                        ],
+                      ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Expanded(
                       child: Container(
-                        constraints: BoxConstraints(minWidth: width - 100),
-                        child: DataTable(
-                          sortColumnIndex: 0,
-                          sortAscending: true,
-                          headingRowColor:
-                              MaterialStateColor.resolveWith((states) => dark),
-                          rows: [
-                            for (int i = 0; i < filterList.length; i++)
-                              DataRow(
-                                cells: <DataCell>[
-                                  DataCell(Text(
-                                    filterList[i].idInspeccion.toString(),
-                                    style:
-                                        TextStyle(fontSize: fontSizeRowTable),
-                                  )),
-                                  DataCell(Text(
-                                    filterList[i].idEquipo.toString(),
-                                    style:
-                                        TextStyle(fontSize: fontSizeRowTable),
-                                  )),
-                                  DataCell(Text(
-                                    RUTValidator.formatFromText(
-                                        filterList[i].rut!),
-                                    style:
-                                        TextStyle(fontSize: fontSizeRowTable),
-                                  )),
-                                  DataCell(Text(
-                                    filterList[i]
-                                            .alturaLevante
-                                            .toString()
-                                            .replaceAll(".", ",") +
-                                        " Milimetros",
-                                    style:
-                                        TextStyle(fontSize: fontSizeRowTable),
-                                  )),
-                                  DataCell(Text(
-                                    formatter.format(filterList[i].ts!),
-                                    style:
-                                        TextStyle(fontSize: fontSizeRowTable),
-                                  )),
-                                  DataCell(IconButton(
-                                    icon: Icon(Icons.search),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ActaOnlyView(
-                                                      inspeccion:
-                                                          filterList[i])));
-                                    },
-                                  )),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                              constraints: BoxConstraints(minWidth: width - 50),
+                              child: DataTable(
+                                sortColumnIndex: sortColumnIndex,
+                                sortAscending: true,
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => dark),
+                                rows: [
+                                  for (int i = 0; i < filterList.length; i++)
+                                    DataRow(
+                                      cells: <DataCell>[
+                                        if (provSelectState.contains(0))
+                                          DataCell(Text(
+                                            filterList[i]
+                                                .idInspeccion
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: fontSizeRowTable),
+                                          )),
+                                        if (provSelectState.contains(1))
+                                          DataCell(Text(
+                                            filterList[i].idEquipo.toString(),
+                                            style: TextStyle(
+                                                fontSize: fontSizeRowTable),
+                                          )),
+                                        if (provSelectState.contains(2))
+                                          DataCell(Text(
+                                            RUTValidator.formatFromText(
+                                                filterList[i].rut!),
+                                            style: TextStyle(
+                                                fontSize: fontSizeRowTable),
+                                          )),
+                                        if (provSelectState.contains(3))
+                                          DataCell(Text(
+                                            filterList[i]
+                                                    .alturaLevante
+                                                    .toString()
+                                                    .replaceAll(".", ",") +
+                                                " Milimetros",
+                                            style: TextStyle(
+                                                fontSize: fontSizeRowTable),
+                                          )),
+                                        if (provSelectState.contains(4))
+                                          DataCell(Text(
+                                            formatter.format(filterList[i].ts!),
+                                            style: TextStyle(
+                                                fontSize: fontSizeRowTable),
+                                          )),
+                                        DataCell(IconButton(
+                                          icon: Icon(Icons.search),
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ActaOnlyView(
+                                                            inspeccion:
+                                                                filterList[
+                                                                    i])));
+                                          },
+                                        )),
+                                      ],
+                                    ),
+                                ],
+                                columns: [
+                                  if (provSelectState.contains(0))
+                                    DataColumn(
+                                      label: Text(
+                                        'Acta ID',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: fontSizeRowHead),
+                                      ),
+                                    ),
+                                  if (provSelectState.contains(1))
+                                    DataColumn(
+                                      label: Text(
+                                        'Equipo ID',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: fontSizeRowHead),
+                                      ),
+                                    ),
+                                  if (provSelectState.contains(2))
+                                    DataColumn(
+                                      onSort: onSort,
+                                      label: Text(
+                                        'Rut cliente',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: fontSizeRowHead),
+                                      ),
+                                    ),
+                                  if (provSelectState.contains(3))
+                                    DataColumn(
+                                      label: Text(
+                                        'Altura de levante',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: fontSizeRowHead),
+                                      ),
+                                    ),
+                                  if (provSelectState.contains(4))
+                                    DataColumn(
+                                      label: Text(
+                                        'Fecha',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: fontSizeRowHead),
+                                      ),
+                                    ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Ver',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: fontSizeRowHead),
+                                    ),
+                                  ),
                                 ],
                               ),
-                          ],
-                          columns: [
-                            DataColumn(
-                              label: Text(
-                                'Acta ID',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Equipo ID',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Rut cliente',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Altura de levante',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Fecha',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
-                            ),
-                            DataColumn(
-                              label: Text(
-                                'Ver',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: fontSizeRowHead),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(
+              height: 50,
+            )
+          ],
         ),
       ),
     );
@@ -280,9 +373,24 @@ class _FilterPanelWidgetState extends State<FilterPanelWidget> {
     'Rut cliente',
     'Altura de levante',
     'Fecha',
-
   ];
-   List<int> _categories=[0];
+
+  final List<String> _filterOptions = [
+    'Acta ID',
+    'ID Equipo',
+    'Rut cliente',
+    'Fecha',
+  ];
+  List<int> _categories = [0];
+  int _filtroBusqueda = 1;
+  @override
+  void initState() {
+    _categories = Provider.of<CommonState>(context, listen: false).categories;
+    _filtroBusqueda =
+        Provider.of<CommonState>(context, listen: false).listaFiltro;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -294,8 +402,8 @@ class _FilterPanelWidgetState extends State<FilterPanelWidget> {
         child: Row(children: [
           Expanded(
             child: SmartSelect<int>.multiple(
-                title: 'Filtro por campo',
-                modalTitle: 'Campo',
+                title: 'Columnas',
+                modalTitle: 'Mostrar/Ocultar columnas',
                 modalType: S2ModalType.fullPage,
                 choiceType: S2ChoiceType.checkboxes,
                 choiceItems: S2Choice.listFrom<int, String>(
@@ -305,8 +413,15 @@ class _FilterPanelWidgetState extends State<FilterPanelWidget> {
                 ),
                 choiceStyle: const S2ChoiceStyle(
                   color: Colors.black,
-
                 ),
+                modalHeaderStyle:  S2ModalHeaderStyle(
+                  iconTheme:
+                     IconThemeData(
+                      color: Colors.white, //change your color here
+                    ),
+                    backgroundColor: dark,
+                    textStyle: TextStyle(color: Colors.white)),
+                modalStyle: const S2ModalStyle(backgroundColor: Colors.white),
                 value: _categories,
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
@@ -315,14 +430,54 @@ class _FilterPanelWidgetState extends State<FilterPanelWidget> {
                     isTwoLine: true,
                   );
                 },
-                onChange: (state) {}),
+                onChange: (state) {
+                  Provider.of<CommonState>(context, listen: false)
+                      .changeSelectCategories(state.value);
+                }),
           ),
           const SizedBox(
             height: 40,
             child: VerticalDivider(
+              width: 9,
+              thickness: 1,
               color: Colors.black,
             ),
-          )
+          ),
+          Expanded(
+            child: SmartSelect<int>.single(
+                title: 'Filtros de busqueda',
+                modalTitle: 'Filtros de busqueda',
+                modalType: S2ModalType.popupDialog,
+                choiceType: S2ChoiceType.chips,
+                choiceItems: S2Choice.listFrom<int, String>(
+                  source: _filterOptions,
+                  value: (index, item) => index,
+                  title: (index, item) => item,
+                ),
+                modalHeaderStyle:  S2ModalHeaderStyle(
+                    iconTheme:
+                    IconThemeData(
+                      color: Colors.white, //change your color here
+                    ),
+                    backgroundColor: dark,
+                    textStyle: TextStyle(color: Colors.white)),
+                modalStyle: const S2ModalStyle(backgroundColor: Colors.white),
+                choiceStyle: const S2ChoiceStyle(
+                  color: Colors.black,
+                ),
+                value: _filtroBusqueda,
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    trailing: const Icon(Icons.arrow_drop_down),
+                    isTwoLine: true,
+                  );
+                },
+                onChange: (state) {
+                  Provider.of<CommonState>(context, listen: false)
+                      .changeSelectFiltro(state.value);
+                }),
+          ),
         ]));
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:app_licman/model/equipo.dart';
 import 'package:app_licman/model/state/equipoState.dart';
 import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
 import 'package:app_licman/ui/ui_acta/acta_inspeccion_page.dart';
@@ -10,18 +11,28 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'const/Colors.dart';
+import 'model/cola.dart';
+import 'model/inspeccion.dart';
+import 'model/modeloimagen.dart';
 import 'model/state/actaState.dart';
 
 import 'model/state/commonVarState.dart';
 
-import 'package:hive/hive.dart';
+
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart' as path_provider;
+
+import 'model/updateTime.dart';
+
+
 void main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.black, // navigation bar color
-    statusBarColor: Colors.black, // status bar color
-  ));
+  Future.delayed(Duration(milliseconds: 1)).then(
+          (value) => SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.black, // navigation bar color
+            statusBarColor: Colors.black, // status
+      )));
+
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Hive.initFlutter();
@@ -29,11 +40,14 @@ void main() async {
     final appDirectory = await path_provider.getApplicationDocumentsDirectory();
     Hive.init(appDirectory.path);
   }
+  Hive.registerAdapter(EquipoAdapter());
+  Hive.registerAdapter(ModeloImgAdapter());
+  Hive.registerAdapter(InspeccionAdapter());
+  Hive.registerAdapter(UpdateTimeAdapter());
+  Hive.registerAdapter(ColaAdapter());
 
+  runApp( MyApp());
 
-
-  await Hive.initFlutter();
-  runApp(const MyApp());
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {

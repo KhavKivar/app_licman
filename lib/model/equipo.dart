@@ -3,12 +3,13 @@
 //     final welcome = welcomeFromJson(jsonString);
 
 import 'package:hive/hive.dart';
-import 'package:meta/meta.dart';
 import 'dart:convert';
+part 'equipo.g.dart';
 
 List<Equipo> welcomeFromJson(String str) => List<Equipo>.from(json.decode(str).map((x) => Equipo.fromJson(x)));
 
 String welcomeToJson(List<Equipo> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 
 @HiveType(typeId: 0)
 class Equipo extends HiveObject{

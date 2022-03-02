@@ -2,14 +2,17 @@
 //
 //     final inspeccion = inspeccionFromJson(jsonString);
 
+import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
-
+part 'inspeccion.g.dart';
 List<Inspeccion> inspeccionFromJson(String str) => List<Inspeccion>.from(json.decode(str).map((x) => Inspeccion.fromJson(x)));
 
 String inspeccionToJson(List<Inspeccion> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Inspeccion {
+
+@HiveType(typeId: 2)
+class Inspeccion extends HiveObject{
   Inspeccion({
      this.idInspeccion,
      this.alarmaRetroceso,
@@ -94,91 +97,197 @@ this.cilindroDeGas,
     this.ts,
 
   });
-
+  @HiveField(0)
   int? idInspeccion;
+
+  @HiveField(1)
   String? alarmaRetroceso;
+
+  @HiveField(2)
   String? asientoOperador;
+
+  @HiveField(3)
   String? baliza;
+
+  @HiveField(4)
   int? idEquipo;
+
+  @HiveField(5)
   String? bocina;
+
+  @HiveField(6)
   String? extintor;
+
+  @HiveField(7)
   String? espejos;
+
+  @HiveField(8)
   int? cantidadEspejos;
+
+  @HiveField(9)
   String? focosFaenerosDelanteros;
+
+  @HiveField(10)
   int? cantidadFocosFaenerosDelanteros;
+
+  @HiveField(11)
   String? focosFaenerosTraseros;
+
+  @HiveField(12)
   int? cantidadFocosFaenerosTraseros;
+
+  @HiveField(13)
   String? llaveContacto;
+
+  @HiveField(14)
   int? cantidadLlaveContacto;
+
+  @HiveField(15)
   String? intermitentesDelanteros;
+
+  @HiveField(16)
   int? cantidadIntermitentesDelanteros;
+
+  @HiveField(17)
   String? intermitentesTraseros;
+
+  @HiveField(18)
   int? cantidadIntermitentesTraseros;
+
+  @HiveField(19)
   String? palancaFrenoMano;
+
+  @HiveField(20)
   String? peraVolante;
+
+  @HiveField(21)
   String? arnesCilindroGas;
+
+  @HiveField(22)
   String? tableroIntrumentos;
+
+  @HiveField(23)
   String? cilindroDesplazador;
+
+  @HiveField(24)
   String? cilindroDireccion;
+
+  @HiveField(25)
   String? cilindroLevanteCentral;
+
+  @HiveField(26)
   String? cilindroInclinacion;
+
+  @HiveField(27)
   String? cilindroLevanteLateral;
+
+  @HiveField(28)
   String? flexibleHidraulico;
+
+  @HiveField(29)
   String? fugaConectores;
+
+  @HiveField(30)
   String? alternador;
+
+  @HiveField(31)
   String? bateria;
+  @HiveField(32)
   String? chapaContacto;
+  @HiveField(33)
   String? sistemaElectrico;
+  @HiveField(34)
   String? horometro;
+  @HiveField(35)
   String? motorPartida;
+  @HiveField(36)
   String? palancaComando;
+  @HiveField(37)
   String? switchLuces;
+  @HiveField(38)
   String? switchMarcha;
+  @HiveField(39)
   String? cadena;
+  @HiveField(40)
   String? carro;
+  @HiveField(41)
   String? horquilla;
+  @HiveField(42)
   String? jaula;
+  @HiveField(43)
   String? llantas;
+  @HiveField(44)
   String? mastil;
+  @HiveField(45)
   String? pintura;
+  @HiveField(46)
   String? rueda;
+  @HiveField(47)
   int? cantidadRueda;
+  @HiveField(48)
   String? desplazadorLateral;
+  @HiveField(49)
   String? direccion;
+  @HiveField(50)
   String? frenoMano;
+  @HiveField(51)
   String? frenoPie;
+  @HiveField(52)
   String? inclinacion;
+  @HiveField(53)
   String? levante;
+  @HiveField(54)
   String? motor;
+  @HiveField(55)
   String? nivelAceiteHidraulico;
+  @HiveField(56)
   String? nivelAceiteMotor;
+  @HiveField(57)
   String ?nivelAceiteTransmision;
+  @HiveField(58)
   String? nivelLiquinoFreno;
+  @HiveField(59)
   String? tapaCombustible;
+  @HiveField(60)
   String? tapaRadiador;
+  @HiveField(61)
   String? transmision;
+  @HiveField(62)
   String? observacion;
+  @HiveField(63)
   String? firmaUrl;
+  @HiveField(64)
   String? rut;
+  @HiveField(65)
   String? nombre;
-
+  @HiveField(66)
   String? joystick;
+  @HiveField(67)
   String? serieCargador;
+  @HiveField(68)
   String? cargadorVoltaje;
+  @HiveField(69)
   String? enchufe;
+  @HiveField(70)
   String? tipo;
+  @HiveField(71)
   String? alturaLevante;
+  @HiveField(72)
   int? carga;
+  @HiveField(73)
   int? cilindroDeGas;
-
+  @HiveField(74)
   String? bateriaObservaciones;
+  @HiveField(75)
   String? serieCargardorText;
+  @HiveField(76)
   String? cargadorVoltajeInfo;
+  @HiveField(77)
   String? enchufeInfo;
-
+  @HiveField(78)
   int? horometroActual;
 
-
+  @HiveField(79)
   DateTime? ts;
 
   factory Inspeccion.fromJson(Map<String, dynamic> json) => Inspeccion(

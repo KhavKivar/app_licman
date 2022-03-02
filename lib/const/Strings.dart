@@ -1,11 +1,11 @@
 class Strings {
 
   //Server
-  static const String urlServerReal = "https://vqty0ji4yl.execute-api.us-east-1.amazonaws.com/prod";
+  static const String urlServerReal = "http://54.242.41.108";
   //Dev Server
   static const String localServer = "http://10.0.2.2:3000";
 
-  static const String urlServer = urlServerReal;
+  static const String urlServer = localServer;
 
 
   static const String urlServerGetEquipos = urlServer+"/api/equipo";
@@ -16,5 +16,6 @@ class Strings {
 
   static const String urlServerPostInps = urlServer+"/api/inspeccion/";
   static const String urlServerGetUrlToUpload = urlServer+"/generatePresignedurl";
+  static const String urlServerGetUpdateState= urlServer+"/api/getLastUpdate/";
 
 }

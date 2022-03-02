@@ -1,17 +1,23 @@
 
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
+part 'modeloimagen.g.dart';
 List<ModeloImg> modeloImgFromJson(String str) => List<ModeloImg>.from(json.decode(str).map((x) => ModeloImg.fromJson(x)));
 
 String modeloImgToJson(List<ModeloImg> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class ModeloImg {
+
+
+@HiveType(typeId: 1)
+class ModeloImg extends HiveObject{
   ModeloImg({
     required this.modelo,
     required this.url,
   });
-
+  @HiveField(0)
   String modelo;
+  @HiveField(1)
   String url;
 
   factory ModeloImg.fromJson(Map<String, dynamic> json) => ModeloImg(
