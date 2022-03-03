@@ -62,6 +62,8 @@ class HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    var orientation = MediaQuery.of(context).orientation;
+
     print(equipos.length);
 
     return Scaffold(
@@ -161,11 +163,11 @@ class HomepageState extends State<Homepage> {
                                   .setFilter(Provider.of<EquipoState>(context,listen: false).equipos);
                             });
                           },
-                          child: CardEquipo(equipo: equipos[index]));
+                          child:  CardEquipo(equipo: equipos[index]));
                     },
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
 
-                        crossAxisCount: 2,crossAxisSpacing: 5,
+                        crossAxisCount: orientation == Orientation.landscape ? 4: 2,crossAxisSpacing: 5,
                       mainAxisSpacing: 5
                     ),
 
@@ -178,30 +180,4 @@ class HomepageState extends State<Homepage> {
     );
   }
 }
-//CardEquipo(equipo: equipos[index])
 
-/*
-*
-*   itemBuilder:  List.generate(equipos.length, (index)  {
-                            return GestureDetector(
-                                onTap: () {
-                                  searchController.clear();
-                                  FocusScope.of(context).unfocus();
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              cardEquipoDetalle(
-                                                  equipo: equipos[index])));
-                                },
-                                child: Column(mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 5.0),
-                                      child: CardEquipo(equipo: equipos[index]),
-                                    )
-                                  ],
-                                ));
-                          },),
-*
-* */

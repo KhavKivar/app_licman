@@ -21,3 +21,20 @@ Future<Inspeccion?> sendActa(Inspeccion acta) async {
     return null;
   }
 }
+
+
+Future<Inspeccion?> sendEditActa(Inspeccion acta) async {
+  final url = Uri.parse(Strings.urlServerEditInps+acta.idInspeccion.toString());
+  try {
+    final response = await http.patch(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(acta.toJson()));
+    print("enviado");
+    return Inspeccion.fromJson(json.decode(response.body));
+  } catch (e) {
+    print(e);
+    return null;
+  }
+}

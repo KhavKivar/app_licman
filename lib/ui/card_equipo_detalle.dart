@@ -1,8 +1,12 @@
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/equipo.dart';
 import 'package:app_licman/model/inspeccion.dart';
+import 'package:app_licman/model/state/actaState.dart';
 import 'package:app_licman/model/state/equipoState.dart';
 import 'package:app_licman/plugins/dart_rut_form.dart';
+import 'package:app_licman/ui/ui_acta/acta_inspeccion_page.dart';
+import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
+import 'package:app_licman/ui/ui_creacion_acta/acta_page_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +37,7 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
 
   @override
   Widget build(BuildContext context) {
-    inspecciones = Provider.of<EquipoState>(context, listen: false)
+    inspecciones = Provider.of<EquipoState>(context)
         .inspeccionList
         .where((element) => element.idEquipo == widget.equipo.id)
         .toList();
@@ -321,7 +325,16 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
                                                             builder: (context) =>
                                                             ActaOnlyView(inspeccion: inspecciones[i])));
                                                   },),
-                                                          IconButton(onPressed: (){}, icon: Icon(Icons.edit_sharp)),
+                                                          IconButton(onPressed: (){
+                                                            Inspeccion acta = inspecciones[i];
+                                                            Provider.of<ActaState>(context,listen: false).convertObjectTostate(acta, context);
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    ActaPageView(edit: true,id:acta.idInspeccion) ));
+                                                            
+                                                          }, icon: Icon(Icons.edit_sharp)),
                                                         ],
 
                                                       ),

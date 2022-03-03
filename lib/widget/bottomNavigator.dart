@@ -37,9 +37,6 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             MaterialPageRoute(
                 builder: (context) =>
                     TableOfActas()));
-      } else if(index == 2){
-        Scaffold.of(context).openDrawer();
-        return;
       }
       Provider.of<CommonState>(context,listen: false).changeIndex(index);
     }
@@ -71,10 +68,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             icon: Icon(Icons.content_paste),
             label: 'Actas/Movimientos',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Configuracion',
-          ),
+
         ]);
   }
 }

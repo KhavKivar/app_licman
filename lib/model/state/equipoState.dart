@@ -18,12 +18,24 @@ class EquipoState extends ChangeNotifier {
   List<ModeloImg> imgList = [];
   List<Cola> listCola = [];
 
+  int indexCola = -1;
+  setIndexCola(int index){
+    indexCola = index;
+  }
 
   bool loading = false;
   addActa(Inspeccion acta){
     inspeccionList.add(acta);
     notifyListeners();
   }
+  setActa(Inspeccion acta){
+    int index = inspeccionList.indexWhere((element) => element.idInspeccion == acta.idInspeccion);
+    if(index != -1){
+      inspeccionList[index] = acta;
+    }
+    notifyListeners();
+  }
+
   removeCola(Cola cola){
     int indexCola = listCola.indexWhere((element) => element.acta?.idInspeccion == cola.acta?.idInspeccion);
     if(indexCola >=0){
@@ -41,7 +53,10 @@ class EquipoState extends ChangeNotifier {
   }
   setHorometro(int idEquipo,int hor){
     int  indexEquipo = equipos.lastIndexWhere((element) => element.id==idEquipo);
-    equipos[indexEquipo].horometro=hor;
+    if(equipos[indexEquipo].horometro < hor){
+
+      equipos[indexEquipo].horometro = hor;
+    }
     filterListEquipo = [...equipos];
     notifyListeners();
 

@@ -12,10 +12,10 @@ import 'package:app_licman/widget/details_equipo_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_multi_formatter/formatters/money_input_enums.dart';
-import 'package:flutter_multi_formatter/formatters/money_input_formatter.dart';
+
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
+import 'package:pattern_formatter/numeric_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 
@@ -198,7 +198,8 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                 child: TextField(
                                   controller: altureLevanteController,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]+[,.]{0,1}[0-9]*')),
+
+                                    FilteringTextInputFormatter.allow(RegExp(r'^[0-9]+[,.]{0,1}[0-9]{0,2}$')),
                                     TextInputFormatter.withFunction(
                                           (oldValue, newValue) => newValue.copyWith(
                                         text: newValue.text.replaceAll(',', '.'),
@@ -213,7 +214,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                   },
                                   style: TextStyle(color: dark, fontSize: 23),
                                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                  maxLength: 12,
+                                  maxLength: 10,
                                   decoration: const InputDecoration(
                                       counterText: '',
                                       fillColor: Colors.white,
@@ -247,7 +248,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                   },
                                   style: TextStyle(color: dark, fontSize: 23),
                                   keyboardType: TextInputType.number,
-                                  maxLength: 12,
+                                  maxLength:9,
                                   decoration: const InputDecoration(
                                       counterText: '',
                                       fillColor: Colors.white,

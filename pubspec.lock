@@ -36,20 +36,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.2"
-  base58check:
-    dependency: transitive
-    description:
-      name: base58check
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
-  bech32:
-    dependency: transitive
-    description:
-      name: bech32
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -291,13 +277,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_multi_formatter:
-    dependency: "direct main"
-    description:
-      name: flutter_multi_formatter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.5.1"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -560,6 +539,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  pattern_formatter:
+    dependency: "direct main"
+    description:
+      name: pattern_formatter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   pedantic:
     dependency: transitive
     description:
@@ -623,6 +609,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  rounded_loading_button:
+    dependency: "direct main"
+    description:
+      name: rounded_loading_button
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.9"
   rxdart:
     dependency: transitive
     description:

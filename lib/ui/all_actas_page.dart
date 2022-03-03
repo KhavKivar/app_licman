@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_select/smart_select.dart';
 
+import '../model/state/actaState.dart';
 import 'ui_acta/acta_only_view_page.dart';
 import 'ui_creacion_acta/acta_page_view.dart';
 
@@ -92,10 +93,16 @@ class _TableOfActasState extends State<TableOfActas> {
             color: Colors.white,
           ),
           onPressed: () {
+
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ActaPageView()),
-            );
+            ).then((value){
+              print("iscalled");
+              Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+            } );
+
+
           }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
@@ -267,18 +274,35 @@ class _TableOfActasState extends State<TableOfActas> {
                                             style: TextStyle(
                                                 fontSize: fontSizeRowTable),
                                           )),
-                                        DataCell(IconButton(
-                                          icon: Icon(Icons.search),
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ActaOnlyView(
-                                                            inspeccion:
-                                                                filterList[
-                                                                    i])));
-                                          },
+                                        DataCell(Row(
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(Icons.remove_red_eye_rounded),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ActaOnlyView(
+                                                                inspeccion:
+                                                                    filterList[
+                                                                        i])));
+                                              },
+                                            ),
+                                            IconButton(onPressed: (){
+                                              Inspeccion acta = inspecciones[i];
+                                              Provider.of<ActaState>(context,listen: false).convertObjectTostate(acta, context);
+                                              Navigator.push(
+
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ActaPageView(edit: true,id:acta.idInspeccion) )).then((value){
+                                                Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+                                              });
+
+                                            }, icon: Icon(Icons.edit_sharp)),
+                                          ],
                                         )),
                                       ],
                                     ),

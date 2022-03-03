@@ -14,7 +14,9 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:signature/signature.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../../model/cola.dart';
 import '../../model/inspeccion.dart';
@@ -25,14 +27,25 @@ import '../../services/inspeccion_services.dart';
 import '../../services/util.dart';
 
 class actaGeneralPartTwo extends StatefulWidget {
-  const actaGeneralPartTwo({Key? key}) : super(key: key);
-
+  const actaGeneralPartTwo(
+      {Key? key, this.editar, this.id, this.onlyCache, this.data})
+      : super(key: key);
+  final bool? editar;
+  final int? id;
+  final bool? onlyCache;
+  final Uint8List? data;
   @override
   _actaGeneralPartTwoState createState() => _actaGeneralPartTwoState();
 }
 
+enum ButtonState { init, loading, done }
+
 class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
     with AutomaticKeepAliveClientMixin {
+  bool isAnimating = true;
+  final RoundedLoadingButtonController _btnController1 =
+      RoundedLoadingButtonController();
+
   @override
   bool get wantKeepAlive => true; //
   TextEditingController? rutController;
@@ -45,7 +58,8 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
     onDrawStart: () => print('onDrawStart called!'),
     onDrawEnd: () => print('onDrawEnd called!'),
   );
-  var activar = false;
+  bool activar = false;
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -60,6 +74,16 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    if (widget.editar != null) {
+      activar = true;
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
     rutController?.dispose();
@@ -67,14 +91,91 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
     obvController?.dispose();
   }
 
+  ButtonState buttonState = ButtonState.init;
+  Widget buildSmallButton() {
+    return Container(
+        decoration:
+            BoxDecoration(shape: BoxShape.circle, color: Colors.blueAccent),
+        child: Center(
+            child: CircularProgressIndicator(
+          color: Colors.white,
+        )));
+  }
+
+  Widget buildSuccesButton() {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        backgroundColor: Colors.green,
+        textStyle: TextStyle(color: Colors.white),
+      ),
+      onPressed: () {},
+      child: FittedBox(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check,
+              color: Colors.white,
+              size: 35,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(
+              "Enviado",
+              style: TextStyle(color: Colors.white, fontSize: 28),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool showError = false;
+  String message = '';
+  bool changeFirm = false;
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final width = MediaQuery.of(context).size.width;
+    final isDone = buttonState == ButtonState.done;
+    final isStreched = isAnimating || buttonState == ButtonState.init;
+    print("widget editar ${activar}");
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
         child: Column(
           children: [
+            if (showError)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Container(
+                  width: double.infinity,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.dangerous_outlined,
+                          color: Colors.white,
+                          size: 34,
+                        ),
+                        Text(
+                          "Error: " + message,
+                          style: TextStyle(color: Colors.white, fontSize: 30),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             Row(
               children: [
                 Expanded(
@@ -143,11 +244,30 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                   backgroundColor: Colors.white,
                 ),
                 if (activar)
-                  Container(
-                    height: 250,
-                    width: double.infinity,
-                    color: Colors.black.withOpacity(0),
-                  ),
+                  widget.editar != null && !changeFirm
+                      ? Container(
+                          height: 250,
+                          width: double.infinity,
+                          color: Colors.black.withOpacity(0),
+                          child: widget.onlyCache != null
+                              ? Image.memory(widget.data!)
+                              : FadeInImage.memoryNetwork(
+                                  placeholder: kTransparentImage,
+                                  image: Provider.of<ActaState>(context,
+                                                  listen: false)
+                                              .MapOfValue['firmaUrl'] !=
+                                          null
+                                      ? Provider.of<ActaState>(context,
+                                              listen: false)
+                                          .MapOfValue['firmaUrl']
+                                      : "",
+                                ),
+                        )
+                      : Container(
+                          height: 250,
+                          width: double.infinity,
+                          color: Colors.black.withOpacity(0),
+                        ),
               ],
             ),
             Container(
@@ -169,6 +289,9 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                         if (data != null) {
                           setState(() {
                             activar = true;
+                            if (widget.editar != null) {
+                              changeFirm = true;
+                            }
                           });
                         }
                       }
@@ -195,6 +318,7 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                     onPressed: () {
                       setState(() {
                         activar = false;
+
                         _controller.clear();
                       });
                     },
@@ -205,36 +329,108 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
             const SizedBox(
               height: 20,
             ),
-            SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.blueAccent,
-                    ),
-                    onPressed: () async {
-                      bool internetOn = await checkConnectivity();
-
-                      if (internetOn) {
-                        enviarActaOnline();
-                      } else {
-                        enviarActaOffline();
-                      }
-                    },
-                    icon: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    label: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: Text(
-                        "Enviar",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                        ),
+            widget.onlyCache != null
+                ? Container(
+                    width: double.infinity,
+                    child: RoundedLoadingButton(
+                      width: width,
+                      height: 60,
+                      successIcon: Icons.save,
+                      failedIcon: Icons.clear,
+                      borderRadius: 10,
+                      onPressed: () async {
+                        final prov = Provider.of<EquipoState>(context,listen: false);
+                        Cola cola = prov.listCola[prov.indexCola];
+                        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
+                            .convertMapToObject("");
+                        if (await _controller.toPngBytes() != null){
+                          cola.data = await _controller.toPngBytes();
+                        }
+                        cola.acta =acta;
+                        cola.save();
+                        await Future.delayed(Duration(milliseconds: 500));
+                        _btnController1.success();
+                        await Future.delayed(Duration(seconds: 1));
+                        Navigator.pop(context);
+                      },
+                      controller: _btnController1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.save,size: 30,),
+                          const SizedBox(width: 10,),
+                          Text('Guardar',
+                              style: TextStyle(color: Colors.white,fontSize: 25)),
+                        ],
                       ),
-                    ))),
+                    ),
+                  )
+                : Container(
+                    alignment: Alignment.center,
+                    child: AnimatedContainer(
+                        width: buttonState == ButtonState.init ||
+                                buttonState == ButtonState.done
+                            ? width
+                            : 70,
+                        height: 70,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                        onEnd: () => setState(() {
+                              if (buttonState != ButtonState.done) {
+                                isAnimating = !isAnimating;
+                              }
+                            }),
+                        child: isStreched
+                            ? OutlinedButton(
+                                onPressed: () async {
+                                  //CheckError
+                                  /*
+                      bool existError = await checkError();
+                      if(existError){
+                        return;
+                      }*/
+
+                                  setState(() {
+                                    buttonState = ButtonState.loading;
+                                  });
+
+                                  bool internetOn = await checkConnectivity();
+
+                                  if (internetOn || widget.editar != null) {
+                                    enviarActaOnline();
+                                  } else {
+                                    enviarActaOffline();
+                                  }
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  backgroundColor: Colors.blueAccent,
+                                  textStyle: TextStyle(color: Colors.white),
+                                ),
+                                child: FittedBox(
+                                    child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.send,
+                                      color: Colors.white,
+                                      size: 35,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Enviar",
+                                      style: TextStyle(
+                                          fontSize: 30, color: Colors.white),
+                                    ),
+                                  ],
+                                )))
+                            : buttonState == ButtonState.done
+                                ? buildSuccesButton()
+                                : buildSmallButton()),
+                  )
           ],
         ),
       ),
@@ -257,7 +453,6 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
         throw generateImageUrl.message!;
       }
 
-
       Uint8List imageInUnit8List = data!;
       final tempDir = await getTemporaryDirectory();
 
@@ -268,51 +463,172 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
 
       return generateImageUrl.downloadUrl!;
     } catch (e) {
-
       return "";
     }
   }
 
+  EnviarActaToEdit(Inspeccion acta) async {
+    Inspeccion? result = await sendEditActa(acta);
+    await Future.delayed(Duration(seconds: 1));
+    print(result.toString());
+    if (result != null) {
+      setState(() {
+        buttonState = ButtonState.done;
+      });
+      await Future.delayed(Duration(seconds: 1));
+      Provider.of<EquipoState>(context, listen: false).setActa(result);
+      Provider.of<EquipoState>(context, listen: false)
+          .setHorometro(acta.idEquipo!, acta.horometroActual!);
+      Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+      Provider.of<ActaState>(context, listen: false).reset();
+      Navigator.pop(context);
+    } else {
+
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 3),
+        content: Row(
+          children: const [
+            Icon(
+              Icons.dangerous,
+              color: Colors.red,
+            ),
+            SizedBox(width: 5),
+            Text('Sin conexion, La acta no pudo ser editada',
+                style: TextStyle(fontSize: 18)),
+          ],
+        ),
+      ));
+      Navigator.pop(context);
+    }
+  }
+
   Future<void> enviarActaOnline() async {
+    //Editar
+    if (widget.editar != null) {
+      if (await _controller.toPngBytes() != null) {
+        print("Cambio la firma");
+        String urlImg = await getUrlImg();
+        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
+            .convertMapToObject(urlImg);
+        acta.idInspeccion = widget.id;
+
+        EnviarActaToEdit(acta);
+      } else {
+        print("Firma =");
+        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
+            .convertMapToObject(Provider.of<ActaState>(context, listen: false)
+                .MapOfValue['firmaUrl']);
+        acta.idInspeccion = widget.id;
+        EnviarActaToEdit(acta);
+      }
+      return;
+    }
+
+    //Create
     String urlImg = await getUrlImg();
     Inspeccion acta = Provider.of<ActaState>(context, listen: false)
         .convertMapToObject(urlImg);
     final result = await sendActa(acta);
     if (result != null) {
+      setState(() {
+        buttonState = ButtonState.done;
+      });
+      await Future.delayed(Duration(seconds: 1));
       Provider.of<EquipoState>(context, listen: false).addActa(result);
       Provider.of<EquipoState>(context, listen: false)
           .setHorometro(acta.idEquipo!, acta.horometroActual!);
       Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+      Provider.of<ActaState>(context, listen: false).reset();
       Navigator.pop(context);
     } else {
       enviarActaOffline();
     }
-
-
   }
 
   Future<void> enviarActaOffline() async {
     final Uint8List? data = await _controller.toPngBytes();
     var box = await Hive.openBox('cola');
-    Inspeccion acta = Provider.of<ActaState>(context, listen: false)
-        .convertMapToObject("");
+    Inspeccion acta =
+        Provider.of<ActaState>(context, listen: false).convertMapToObject("");
 
     DateFormat formatter = DateFormat('yyyy-MM-dd hh:mm');
-    String now =   formatter.format(DateTime.now()); // 30/09/2021 15:54:30
+    String now = formatter.format(DateTime.now()); // 30/09/2021 15:54:30
     Cola cola = Cola(acta, now, "SIN ENVIAR", data);
     box.add(cola);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       duration: Duration(seconds: 3),
       content: Row(
         children: [
-          Icon(Icons.dangerous,color: Colors.red,),
-          const SizedBox(width:5),
-          Text('Sin conexion a internet, se envio a la cola de actas',style:TextStyle(fontSize: 18)),
+          Icon(
+            Icons.dangerous,
+            color: Colors.red,
+          ),
+          const SizedBox(width: 5),
+          Text('Sin conexion a internet, se envio a la cola de actas',
+              style: TextStyle(fontSize: 18)),
         ],
       ),
     ));
-    Provider.of<EquipoState>(context,listen: false).addCola(cola);
+    Provider.of<EquipoState>(context, listen: false).addCola(cola);
+    Provider.of<ActaState>(context, listen: false).reset();
     Navigator.pop(context);
+  }
 
+  Future<bool> checkError() async {
+    String alturaLevante = Provider.of<ActaState>(context, listen: false)
+        .MapOfValue['alturaLevante'];
+    String horometroActual = Provider.of<ActaState>(context, listen: false)
+        .MapOfValue['horometroActual'];
+    //Inspeccion acta =Provider.of<ActaState>(context, listen: false).convertMapToObject("");
+    final Uint8List? data = await _controller.toPngBytes();
+
+    if (rutController?.value.text == "" ||
+        RUTValidator(numbers: 0, validationErrorText: '', dv: '')
+                .validator(rutController!.value.text) !=
+            null) {
+      setState(() {
+        showError = true;
+      });
+      message = "Rut invalido";
+      return true;
+    }
+
+    if (nameController?.value.text == "") {
+      setState(() {
+        showError = true;
+      });
+      message = "Nombre vacio";
+      return true;
+    }
+
+    if (alturaLevante == "") {
+      setState(() {
+        showError = true;
+      });
+      message = "Altura de levante vacia";
+      return true;
+    }
+    if (horometroActual == "") {
+      setState(() {
+        showError = true;
+      });
+      message = "Campo horometro vacio";
+      return true;
+    }
+
+    if (data == null) {
+      setState(() {
+        showError = true;
+      });
+      message = "Firma vacia";
+      return true;
+    } else {
+      setState(() {
+        showError = false;
+      });
+
+      return false;
+    }
   }
 }

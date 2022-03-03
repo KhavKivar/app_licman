@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:app_licman/const/Colors.dart';
 import 'package:app_licman/model/state/commonVarState.dart';
 import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
@@ -8,9 +10,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ActaPageView extends StatefulWidget {
-  const ActaPageView({Key? key}) : super(key: key);
+import '../../model/state/actaState.dart';
 
+class ActaPageView extends StatefulWidget {
+  const ActaPageView({Key? key, this.edit, int? this.id, this.onlyCacheSave, this.data}) : super(key: key);
+  final bool? edit;
+  final int? id;
+  final bool? onlyCacheSave;
+  final Uint8List? data;
   @override
   _ActaPageViewState createState() => _ActaPageViewState();
 }
@@ -22,16 +29,28 @@ class _ActaPageViewState extends State<ActaPageView> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(backgroundColor: dark,title: Text("Creacion de acta",style: TextStyle(
+        appBar: AppBar(
+          backgroundColor: dark,
+          title: Text(
+            widget.edit != null ? "Editar acta" : "Creacion de acta",
+            style: TextStyle(),
+          ),
+          leading: BackButton(onPressed: (){
+              if(widget.edit !=null){
+                Provider.of<ActaState>(context, listen: false).reset();
+              }
 
-        ),),),
+             Navigator.of(context).pop();
+
+          },),
+        ),
         body: Stack(
           children: [
-
             Column(
               children: [
                 Padding(
-                    padding: const EdgeInsets.only(left: 30,right:30,top: 10),
+                    padding:
+                        const EdgeInsets.only(left: 30, right: 30, top: 10),
                     child: TopNavigator(
                       controller: controller,
                     )),
@@ -43,8 +62,12 @@ class _ActaPageViewState extends State<ActaPageView> {
                       SingleChildScrollView(
                         child: ActaGeneral(),
                       ),
-                      actaGeneralPartTwo(),
-
+                      actaGeneralPartTwo(
+                        editar: widget.edit,
+                        id: widget.id,
+                        onlyCache: widget.onlyCacheSave,
+                        data:widget.data
+                      ),
                     ],
                   ),
                 ),
@@ -125,7 +148,6 @@ class _TopNavigatorState extends State<TopNavigator> {
                   fontSizeText: fontSizeNav,
                 )),
           )),
-
         ],
       ),
     );
@@ -158,12 +180,9 @@ class RowNavigator extends StatelessWidget {
           width: 10,
         ),
         Expanded(
-          child: Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: fontSizeText),
-              overflow: TextOverflow.ellipsis
-
-          ),
+          child: Text(title,
+              style: TextStyle(color: Colors.white, fontSize: fontSizeText),
+              overflow: TextOverflow.ellipsis),
         ),
       ],
     );

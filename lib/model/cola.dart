@@ -13,7 +13,9 @@ class Cola extends HiveObject{
   @HiveField(2)
   String status = "WAITING";
   @HiveField(3)
-  Uint8List? data ;
+  Uint8List? data;
+
+
 
 
   Cola(this.acta, this.ts, this.status,this.data);

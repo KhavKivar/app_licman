@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:developer';
 
@@ -9,39 +8,35 @@ import 'package:app_licman/model/modeloimagen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 Future<List<Equipo>> getEquipos() async {
   List<Equipo> listado = [];
   final client = http.Client();
-  final response = await client.get(Uri.parse(Strings.urlServerGetEquipos));
-  print(response);
-  print(response.body);
-  if (response.statusCode == 200) {
-    listado = (json.decode(response.body) as List)
-        .map((i) => Equipo.fromJson(i))
-        .toList();
-  }else {
+  try {
+    final response = await client.get(Uri.parse(Strings.urlServerGetEquipos));
 
-
-
+    if (response.statusCode == 200) {
+      listado = (json.decode(response.body) as List)
+          .map((i) => Equipo.fromJson(i))
+          .toList();
+    }
+  } catch (e) {
+    listado = [];
   }
-
   return listado;
 }
-
-
 
 Future<List<Inspeccion>> getInspecciones() async {
   List<Inspeccion> listado = [];
   final client = http.Client();
-  try{
-  final response = await client.get(Uri.parse(Strings.urlServerGetInspecciones));
-  log(response.body);
+  try {
+    final response =
+        await client.get(Uri.parse(Strings.urlServerGetInspecciones));
+    log(response.body);
     listado = (json.decode(response.body) as List)
         .map((i) => Inspeccion.fromJson(i))
         .toList();
-  }catch(e){
-      print(e);
+  } catch (e) {
+    print(e);
   }
 
   return listado;
@@ -50,14 +45,13 @@ Future<List<Inspeccion>> getInspecciones() async {
 Future<List<ModeloImg>> getImgList() async {
   List<ModeloImg> listado = [];
   final client = http.Client();
-  try{
+  try {
     final response = await client.get(Uri.parse(Strings.urlServerGetImg));
     log(response.body);
     listado = modeloImgFromJson(response.body);
-  }catch(e){
+  } catch (e) {
     print(e);
   }
 
   return listado;
 }
-

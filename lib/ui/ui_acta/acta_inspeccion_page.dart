@@ -3,6 +3,7 @@ import 'package:app_licman/model/state/actaState.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../ui_creacion_acta/acta_page_view.dart';
@@ -322,6 +323,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                                           width: 90,
 
                                                           child: TextField(
+                                                            inputFormatters: [
+                                                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                                            ],
                                                             keyboardType:
                                                                 TextInputType
                                                                     .number,
@@ -580,6 +584,7 @@ class _RenderSpecialFieldsState extends State<RenderSpecialFields> {
                     onChanged: (value) {
                       mapSetFunct[widget.keyMap](value);
                     },
+
                     decoration: InputDecoration(
                       fillColor: Colors.white,
                       filled: true,
