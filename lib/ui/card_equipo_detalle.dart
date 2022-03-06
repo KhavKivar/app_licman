@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../model/movimiento.dart';
 import 'ui_acta/acta_only_view_page.dart';
 
 class cardEquipoDetalle extends StatefulWidget {
@@ -31,16 +32,24 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
 
 
   List<Inspeccion> inspecciones = [];
+  List<Movimiento> movimientos = [];
   DateFormat formatter = DateFormat('yyyy-MM-dd hh:mm');
   var numberFormatter =  NumberFormat.decimalPattern('de-DE');
-
-
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
     inspecciones = Provider.of<EquipoState>(context)
         .inspeccionList
         .where((element) => element.idEquipo == widget.equipo.id)
         .toList();
+
+
+    movimientos = Provider.of<EquipoState>(context)
+        .movimientos.where((element) =>  inspecciones.where((x) => x.idInspeccion == element.idInspeccion).toList().length > 0 ).toList();
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -239,14 +248,14 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
                                     borderBool: false,
                                   ),
                                   RowWidget(
-                                    value: widget.equipo.altura.toString().replaceAll(".", ","),
+                                    value: widget.equipo.altura.toString().replaceAll(".", ",")+" mm",
                                     title: 'Altura',
                                     fontSizeContent: fontSizeContent,
                                     borderBool: false,
                                   ),
 
                                   RowWidget(
-                                    value: numberFormatter.format(widget.equipo.capacidad).toString(),
+                                    value: numberFormatter.format(widget.equipo.capacidad).toString()+" Kg",
                                     title: 'Capacidad',
                                     fontSizeContent: fontSizeContent,
                                     borderBool: false,
@@ -363,13 +372,13 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
                                             DataColumn(
                                               label: Text(
                                                 'Horometro acta',
-                                                style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead-5),
+                                                style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
                                               ),
                                             ),
                                             DataColumn(
                                               label: Text(
                                                 'Altura de levante',
-                                                style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead-5),
+                                                style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
                                               ),
                                             ),
 
@@ -401,7 +410,116 @@ class _cardEquipoDetalleState extends State<cardEquipoDetalle> {
                                 )),
                               )
                           else
-                            Text("2")
+                            movimientos.length == 0 ?  Container(
+                              child: Center(
+                                  child: Text(
+                                    "No hay movimientos todavia",
+                                    style: TextStyle(fontSize: 25),
+                                  )),
+                            ): Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Container(
+                                      constraints: BoxConstraints(minWidth: width),
+                                      child: DataTable(
+                                        dataRowHeight: 70,
+                                        showBottomBorder: true,
+                                        sortColumnIndex: 0,
+                                        sortAscending: false,
+                                        headingRowColor:
+                                        MaterialStateColor.resolveWith((states) => dark),
+                                        rows: [
+                                          for (int i = 0;
+                                          i < movimientos.length;
+                                          i++)
+                                            DataRow(
+                                              cells: <DataCell>[
+                                                DataCell(Text(formatter
+                                                    .format(movimientos[i].fechaMov),style: TextStyle(fontSize: fontSizeRowTable),
+                                                )),
+                                                DataCell(
+                                                    Text(movimientos[i].idMovimiento.toString(),style: TextStyle(fontSize: fontSizeRowTable),)),
+                                                DataCell(
+                                                    Text(movimientos[i].transporte,style: TextStyle(fontSize: fontSizeRowTable),)),
+                                                DataCell(
+                                                    Text(RUTValidator.formatFromText(movimientos[i].rut),style: TextStyle(fontSize: fontSizeRowTable),)),
+                                                DataCell(
+                                                    Text(movimientos[i].tipo,style: TextStyle(fontSize: fontSizeRowTable),)),
+
+                                                DataCell(Text(movimientos[i].idInspeccion.toString(),style: TextStyle(fontSize: fontSizeRowTable),)),
+                                                DataCell(Text(movimientos[i].idGuiaDespacho.toString(),style: TextStyle(fontSize: fontSizeRowTable),)),
+                                                DataCell(Text(
+                                                  movimientos[i].fechaRetiro ==null ? "":
+                                                  formatter
+                                                    .format(movimientos[i].fechaRetiro!),style: TextStyle(fontSize: fontSizeRowTable),)),
+
+                                              ],
+                                            ),
+                                        ],
+                                        columns: [
+                                          DataColumn(
+                                            label: Text(
+                                              'Fecha de movimiento',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+
+                                          DataColumn(
+                                            label: Text(
+                                              'Movimiento ID',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Transporte',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Rut Empresa',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Tipo',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+
+
+
+                                          DataColumn(
+                                            label: Text(
+                                              'Acta ID',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'N° Guia de despacho',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Fecha de retiro',
+                                              style: TextStyle(color: Colors.white,fontSize: fontSizeRowHead),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
                         ],
                       ),
                     ),

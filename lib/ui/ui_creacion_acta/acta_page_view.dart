@@ -23,10 +23,10 @@ class ActaPageView extends StatefulWidget {
 }
 
 class _ActaPageViewState extends State<ActaPageView> {
+  final PageController controller = PageController();
+
   @override
   Widget build(BuildContext context) {
-    final PageController controller = PageController();
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(

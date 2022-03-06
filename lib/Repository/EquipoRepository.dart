@@ -16,6 +16,7 @@ class EquipoRepository {
       return List<Equipo>.from(eq);
     }else{
       equipos = await getEquipos();
+
       if(exists){
         hiveService.removeBoxes("Equipos").then((x) async {
           await hiveService.addBoxes(equipos, "Equipos");
@@ -37,8 +38,6 @@ class EquipoRepository {
         print(timeEq.updateTime.toString());
         await hiveService.addOneBox(timeEq,"cache_time_equipo");
       }
-
-
     }
     return equipos;
   }

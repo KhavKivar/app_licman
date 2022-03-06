@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app_licman/model/equipo.dart';
+import 'package:app_licman/model/movimiento.dart';
 import 'package:app_licman/model/state/equipoState.dart';
 import 'package:app_licman/ui/ui_creacion_acta/acta_general_page.dart';
 import 'package:app_licman/ui/ui_acta/acta_inspeccion_page.dart';
@@ -38,14 +39,14 @@ void main() async {
     await Hive.initFlutter();
   } else {
     final appDirectory = await path_provider.getApplicationDocumentsDirectory();
-    Hive.init(appDirectory.path);
+    Hive.init(appDirectory.path+"/data/");
   }
   Hive.registerAdapter(EquipoAdapter());
   Hive.registerAdapter(ModeloImgAdapter());
   Hive.registerAdapter(InspeccionAdapter());
   Hive.registerAdapter(UpdateTimeAdapter());
   Hive.registerAdapter(ColaAdapter());
-
+  Hive.registerAdapter(MovimientoAdapter());
   runApp( MyApp());
 
 }

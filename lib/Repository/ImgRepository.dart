@@ -13,6 +13,7 @@ class ImgRepository{
     List<ModeloImg> imgs = [];
 
     if(exists && !forceUpdate){
+      print("Cache imagenes");
       var eq = await(hiveService.getBoxes('IMG'));
       return List<ModeloImg>.from(eq);
     }else{

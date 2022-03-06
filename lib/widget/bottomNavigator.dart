@@ -19,7 +19,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   void didChangeDependencies() {
     _selectedIndex =  Provider.of<CommonState>(context).selectIndex;
-    print("change");
+
   }
 
   void _onItemTapped(int index) {

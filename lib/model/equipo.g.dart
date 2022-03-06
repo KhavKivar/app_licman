@@ -25,7 +25,7 @@ class EquipoAdapter extends TypeAdapter<Equipo> {
       capacidad: fields[5] as int,
       mastil: fields[6] as String,
       altura: fields[7] as double,
-      ano: fields[8] as int,
+      ano: fields[8] as String,
       horometro: fields[9] as int,
       precioNeto: fields[10] as int,
     );

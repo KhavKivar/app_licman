@@ -14,6 +14,7 @@ class InspeccionRepository{
     List<Inspeccion> actas = [];
 
     if(exists && !forceUpdate){
+      print("Cache actas");
       var eq = await(hiveService.getBoxes('ACTA'));
       return List<Inspeccion>.from(eq);
     }else{
@@ -29,7 +30,6 @@ class InspeccionRepository{
       List<UpdateTime> updateList = await getLastUpdate();
       if(cacheExist){
         hiveService.removeBoxes("cache_time_acta").then((x)async{
-
           UpdateTime timeEq = updateList[1];
           await hiveService.addOneBox(timeEq,"cache_time_acta");
         });

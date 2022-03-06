@@ -10,9 +10,10 @@ import 'package:http/http.dart' as http;
 Future<List<UpdateTime>> getLastUpdate() async {
   final url = Uri.parse(Strings.urlServerGetUpdateState);
   List<UpdateTime> listUpdate = [];
+
   try {
     final response = await http.get(url);
-    log(response.body);
+
     listUpdate = updateTimeFromJson(response.body);
     return listUpdate ;
   } catch (e) {

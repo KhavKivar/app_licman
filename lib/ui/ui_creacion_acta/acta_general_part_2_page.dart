@@ -151,7 +151,7 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
           children: [
             if (showError)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.only(top:0,bottom: 10),
                 child: Container(
                   width: double.infinity,
                   height: 60,
@@ -250,17 +250,27 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                           width: double.infinity,
                           color: Colors.black.withOpacity(0),
                           child: widget.onlyCache != null
-                              ? Image.memory(widget.data!)
-                              : FadeInImage.memoryNetwork(
-                                  placeholder: kTransparentImage,
-                                  image: Provider.of<ActaState>(context,
-                                                  listen: false)
-                                              .MapOfValue['firmaUrl'] !=
-                                          null
-                                      ? Provider.of<ActaState>(context,
-                                              listen: false)
-                                          .MapOfValue['firmaUrl']
-                                      : "",
+                              ? Image.memory(
+                                  widget.data!,
+                                )
+                              : Stack(
+                                  children: [
+                                    const Center(
+                                        child: CircularProgressIndicator()),
+                                    Center(
+                                      child: FadeInImage.memoryNetwork(
+                                        placeholder: kTransparentImage,
+                                        image: Provider.of<ActaState>(context,
+                                                        listen: false)
+                                                    .MapOfValue['firmaUrl'] !=
+                                                null
+                                            ? Provider.of<ActaState>(context,
+                                                    listen: false)
+                                                .MapOfValue['firmaUrl']
+                                            : "",
+                                      ),
+                                    ),
+                                  ],
                                 ),
                         )
                       : Container(
@@ -339,14 +349,23 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                       failedIcon: Icons.clear,
                       borderRadius: 10,
                       onPressed: () async {
-                        final prov = Provider.of<EquipoState>(context,listen: false);
+                        bool existError = await checkError();
+                        if (existError) {
+                          _btnController1.error();
+                          await Future.delayed(Duration(milliseconds: 1000));
+                          _btnController1.reset();
+                          return;
+                        }
+                        final prov =
+                            Provider.of<EquipoState>(context, listen: false);
                         Cola cola = prov.listCola[prov.indexCola];
-                        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
-                            .convertMapToObject("");
-                        if (await _controller.toPngBytes() != null){
+                        Inspeccion acta =
+                            Provider.of<ActaState>(context, listen: false)
+                                .convertMapToObject("");
+                        if (await _controller.toPngBytes() != null) {
                           cola.data = await _controller.toPngBytes();
                         }
-                        cola.acta =acta;
+                        cola.acta = acta;
                         cola.save();
                         await Future.delayed(Duration(milliseconds: 500));
                         _btnController1.success();
@@ -357,10 +376,16 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.save,size: 30,),
-                          const SizedBox(width: 10,),
+                          Icon(
+                            Icons.save,
+                            size: 30,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           Text('Guardar',
-                              style: TextStyle(color: Colors.white,fontSize: 25)),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 25)),
                         ],
                       ),
                     ),
@@ -372,7 +397,7 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                                 buttonState == ButtonState.done
                             ? width
                             : 70,
-                        height: 70,
+                        height: 60,
                         duration: Duration(milliseconds: 200),
                         curve: Curves.easeIn,
                         onEnd: () => setState(() {
@@ -383,24 +408,25 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
                         child: isStreched
                             ? OutlinedButton(
                                 onPressed: () async {
-                                  //CheckError
-                                  /*
-                      bool existError = await checkError();
-                      if(existError){
-                        return;
-                      }*/
-
+                                  bool existError = await checkError();
+                                  if (existError) {
+                                    return;
+                                  }
                                   setState(() {
                                     buttonState = ButtonState.loading;
                                   });
+                                  enviarActaOnline();
 
-                                  bool internetOn = await checkConnectivity();
-
-                                  if (internetOn || widget.editar != null) {
-                                    enviarActaOnline();
-                                  } else {
+                                  /*
+                                  try {
+                                    if (internetOn || widget.editar != null) {
+                                      enviarActaOnline();
+                                    } else {
+                                      enviarActaOffline();
+                                    }
+                                  } on SocketException catch (e) {
                                     enviarActaOffline();
-                                  }
+                                  }*/
                                 },
                                 style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
@@ -468,60 +494,56 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
   }
 
   EnviarActaToEdit(Inspeccion acta) async {
-    Inspeccion? result = await sendEditActa(acta);
-    await Future.delayed(Duration(seconds: 1));
-    print(result.toString());
-    if (result != null) {
-      setState(() {
-        buttonState = ButtonState.done;
-      });
+    try {
+      Inspeccion? result = await sendEditActa(acta);
       await Future.delayed(Duration(seconds: 1));
-      Provider.of<EquipoState>(context, listen: false).setActa(result);
-      Provider.of<EquipoState>(context, listen: false)
-          .setHorometro(acta.idEquipo!, acta.horometroActual!);
-      Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
-      Provider.of<ActaState>(context, listen: false).reset();
-      Navigator.pop(context);
-    } else {
-
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 3),
-        content: Row(
-          children: const [
-            Icon(
-              Icons.dangerous,
-              color: Colors.red,
-            ),
-            SizedBox(width: 5),
-            Text('Sin conexion, La acta no pudo ser editada',
-                style: TextStyle(fontSize: 18)),
-          ],
-        ),
-      ));
-      Navigator.pop(context);
+      if (result != null) {
+        setState(() {
+          buttonState = ButtonState.done;
+        });
+        await Future.delayed(Duration(seconds: 1));
+        Provider.of<EquipoState>(context, listen: false).setActa(result);
+        Provider.of<EquipoState>(context, listen: false)
+            .setHorometro(acta.idEquipo!, acta.horometroActual!);
+        Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+        Provider.of<ActaState>(context, listen: false).reset();
+        Navigator.pop(context);
+      }
+    }on SocketException{
+      setState(() {
+        buttonState = ButtonState.init;
+        showError = true;
+        message = "Sin conexion";
+      });
+    }on HttpException catch(e){
+      print(e.toString());
+      setState(() {
+        buttonState = ButtonState.init;
+        showError = true;
+        message = e.toString();
+      });
+    } catch(e){
+      setState(() {
+        buttonState = ButtonState.init;
+        showError = true;
+        message = e.toString();
+      });
     }
+    return;
   }
 
   Future<void> enviarActaOnline() async {
     //Editar
     if (widget.editar != null) {
+      String urlImg = Provider.of<ActaState>(context, listen: false)
+          .MapOfValue['firmaUrl'];
       if (await _controller.toPngBytes() != null) {
-        print("Cambio la firma");
-        String urlImg = await getUrlImg();
-        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
-            .convertMapToObject(urlImg);
-        acta.idInspeccion = widget.id;
-
-        EnviarActaToEdit(acta);
-      } else {
-        print("Firma =");
-        Inspeccion acta = Provider.of<ActaState>(context, listen: false)
-            .convertMapToObject(Provider.of<ActaState>(context, listen: false)
-                .MapOfValue['firmaUrl']);
-        acta.idInspeccion = widget.id;
-        EnviarActaToEdit(acta);
+        urlImg = await getUrlImg();
       }
+      Inspeccion acta = Provider.of<ActaState>(context, listen: false)
+          .convertMapToObject(urlImg);
+      acta.idInspeccion = widget.id;
+      await EnviarActaToEdit(acta);
       return;
     }
 
@@ -529,22 +551,42 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
     String urlImg = await getUrlImg();
     Inspeccion acta = Provider.of<ActaState>(context, listen: false)
         .convertMapToObject(urlImg);
-    final result = await sendActa(acta);
-    if (result != null) {
-      setState(() {
-        buttonState = ButtonState.done;
-      });
-      await Future.delayed(Duration(seconds: 1));
-      Provider.of<EquipoState>(context, listen: false).addActa(result);
-      Provider.of<EquipoState>(context, listen: false)
-          .setHorometro(acta.idEquipo!, acta.horometroActual!);
-      Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
-      Provider.of<ActaState>(context, listen: false).reset();
-      Navigator.pop(context);
-    } else {
+    try{
+      final result = await sendActa(acta);
+      if (result != null) {
+        setState(() {
+          buttonState = ButtonState.done;
+        });
+        await Future.delayed(Duration(seconds: 1));
+        Provider.of<EquipoState>(context, listen: false).addActa(result);
+        Provider.of<EquipoState>(context, listen: false)
+            .setHorometro(acta.idEquipo!, acta.horometroActual!);
+        Provider.of<CommonState>(context, listen: false).changeActaIndex(0);
+        Provider.of<ActaState>(context, listen: false).reset();
+        Navigator.pop(context);
+      }
+    }on SocketException{
+      print("enter");
       enviarActaOffline();
+    }on HttpException catch(e){
+
+      setState(() {
+        buttonState = ButtonState.init;
+        showError = true;
+        message = e.toString();
+      });
+    } catch(e){
+
+      setState(() {
+        buttonState = ButtonState.init;
+        showError = true;
+        message = e.toString();
+      });
     }
+    return;
   }
+
+
 
   Future<void> enviarActaOffline() async {
     final Uint8List? data = await _controller.toPngBytes();
@@ -617,7 +659,7 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
       return true;
     }
 
-    if (data == null) {
+    if (data == null && widget.editar == null) {
       setState(() {
         showError = true;
       });
@@ -632,3 +674,5 @@ class _actaGeneralPartTwoState extends State<actaGeneralPartTwo>
     }
   }
 }
+
+

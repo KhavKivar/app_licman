@@ -1,4 +1,6 @@
 import 'package:app_licman/Repository/EquipoRepository.dart';
+import 'package:app_licman/Repository/movimientoRepository.dart';
+import 'package:app_licman/model/movimiento.dart';
 import 'package:app_licman/services/inventario/equiposServices.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +19,7 @@ class EquipoState extends ChangeNotifier {
   List<Inspeccion> inspeccionList = [];
   List<ModeloImg> imgList = [];
   List<Cola> listCola = [];
+  List<Movimiento> movimientos = [];
 
   int indexCola = -1;
   setIndexCola(int index){
@@ -82,14 +85,19 @@ class EquipoState extends ChangeNotifier {
    initState(context) async{
     loading = true;
     equipos = await EquipoRepository().get(false);
+
     filterListEquipo = [...equipos];
     loading=false;
     inspeccionList = await InspeccionRepository().get(false);
     imgList = await ImgRepository().get(false);
-
     listCola = await ColaRepository().get();
-
+    movimientos = await MovimientoRepository().get(false);
     notifyListeners();
     return loading;
+  }
+
+  void setMovimientoList(List<Movimiento> list) {
+    movimientos = list;
+    notifyListeners();
   }
 }

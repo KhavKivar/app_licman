@@ -13,13 +13,16 @@ Future<List<Equipo>> getEquipos() async {
   final client = http.Client();
   try {
     final response = await client.get(Uri.parse(Strings.urlServerGetEquipos));
-
+     print(response.body);
     if (response.statusCode == 200) {
+
       listado = (json.decode(response.body) as List)
           .map((i) => Equipo.fromJson(i))
           .toList();
     }
   } catch (e) {
+    print("error ${e}");
+
     listado = [];
   }
   return listado;

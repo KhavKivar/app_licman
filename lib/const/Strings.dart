@@ -7,7 +7,7 @@ class Strings {
   //Desktop Sv
   static const String desktopLocalSv = "http://localhost:3000";
 
-  static const String urlServer = localServer;
+  static const String urlServer = desktopLocalSv;
 
 
   static const String urlServerGetEquipos = urlServer+"/api/equipo";
@@ -19,5 +19,6 @@ class Strings {
   static const String urlServerGetUrlToUpload = urlServer+"/generatePresignedurl";
   static const String urlServerGetUpdateState= urlServer+"/api/getLastUpdate/";
   static const String urlServerEditInps = urlServer+"/api/inspeccion/id/";
+  static const String urlServerGetMovimientos = urlServer+"/api/movimiento/";
 
 }

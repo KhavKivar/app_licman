@@ -6,7 +6,7 @@ class ColaRepository {
   get() async {
     var eq = await(hiveService.getBoxes('cola'));
     List<Cola> lista = List<Cola>.from(eq);
-    print("LENGHT COLA ${lista.length}");
+
 
     return lista ;
   }

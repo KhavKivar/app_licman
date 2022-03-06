@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:app_licman/const/Strings.dart';
 import 'package:app_licman/model/equipo.dart';
@@ -15,13 +16,22 @@ Future<Inspeccion?> sendActa(Inspeccion acta) async {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(acta.toJson()));
-    return Inspeccion.fromJson(json.decode(response.body));
-  } catch (e) {
-    print(e);
-    return null;
+    if(response.statusCode == 200){
+      return Inspeccion.fromJson(json.decode(response.body));
+    }
+    if(response.statusCode== 505){
+      print("code 505");
+      throw HttpException(jsonDecode(response.body)['sqlMessage']);
+    }
+  }on SocketException {
+    throw SocketException('No Internet connection');
+  }on HttpException catch(e){
+    throw HttpException(e.toString());
+  } catch(e){
+    throw Exception(e);
   }
+  return null;
 }
-
 
 Future<Inspeccion?> sendEditActa(Inspeccion acta) async {
   final url = Uri.parse(Strings.urlServerEditInps+acta.idInspeccion.toString());
@@ -31,10 +41,29 @@ Future<Inspeccion?> sendEditActa(Inspeccion acta) async {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(acta.toJson()));
-    print("enviado");
-    return Inspeccion.fromJson(json.decode(response.body));
-  } catch (e) {
-    print(e);
-    return null;
+    if(response.statusCode == 200){
+      return Inspeccion.fromJson(json.decode(response.body));
+    }
+    if(response.statusCode== 505){
+      print(response.body);
+      throw HttpException(jsonDecode(response.body)['message']['sqlMessage']);
+    }
+  } on SocketException {
+    throw SocketException('No Internet connection');
+  } on HttpException catch(e){
+    throw HttpException(e.toString());
+  }catch(e){
+    throw Exception(e);
+  }
+  return null;
+}
+
+
+class HttpException implements Exception {
+  final String message;
+  HttpException(this.message);  // Pass your message in constructor.
+  @override
+  String toString() {
+    return message;
   }
 }

@@ -50,6 +50,7 @@ dependencies:
   keyboard_actions: ^3.4.7
   pattern_formatter: ^2.0.0
   smart_select: ^4.3.2
+  progress_dialog: ^1.2.4
 
 
 

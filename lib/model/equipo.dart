@@ -52,7 +52,7 @@ class Equipo extends HiveObject{
   double altura = 0.0;
 
   @HiveField(8)
-  int ano;
+  String ano;
 
   @HiveField(9)
   int horometro;

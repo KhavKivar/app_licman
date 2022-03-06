@@ -64,7 +64,7 @@ class HomepageState extends State<Homepage> {
     double height = MediaQuery.of(context).size.height;
     var orientation = MediaQuery.of(context).orientation;
 
-    print(equipos.length);
+
 
     return Scaffold(
       bottomNavigationBar: const BottomNavigator(),

@@ -217,6 +217,7 @@ class _ActaGeneralState extends State<ActaGeneral> with AutomaticKeepAliveClient
                                   maxLength: 10,
                                   decoration: const InputDecoration(
                                       counterText: '',
+                                      suffixText: 'mm',
                                       fillColor: Colors.white,
                                       filled: true,
                                       focusedBorder: OutlineInputBorder(

@@ -438,17 +438,25 @@ class _ActaOnlyViewState extends State<ActaOnlyView> {
                                                   ),
                                                   widget.data == null ?  SizedBox(
                                                     height: 200,
-                                                    child: FadeInImage
-                                                        .memoryNetwork(
-                                                      placeholder:
-                                                          kTransparentImage,
-                                                      image: widget
-                                                          .inspeccion.firmaUrl!,
+                                                    child: Stack(
+                                                      children: [
+                                                        const Center(child: CircularProgressIndicator()),
+                                                        Center(
+                                                          child: FadeInImage
+                                                              .memoryNetwork(
+                                                            placeholder:
+                                                                kTransparentImage,
+                                                            image: widget
+                                                                .inspeccion.firmaUrl!,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ) :
                                                  SizedBox(
                                                     height: 200,
-                                                    child:  Image.memory(widget.data!)
+                                                    child:  Image.memory(
+                                                        widget.data!)
                                                     ),
 
 
@@ -694,14 +702,17 @@ class RowWidgetObvAndDetails extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               StringInitial,
               style: TextStyle(fontSize: fontSizeRow),
             ),
-            Text(StringFinal, style: TextStyle(fontSize: fontSizeRow))
+            const SizedBox(width: 50,),
+            Expanded(child: Align(
+                alignment: Alignment.topRight,
+                child: Text(StringFinal, style: TextStyle(fontSize: fontSizeRow))))
           ],
         ),
       ),
